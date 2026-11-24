@@ -2,7 +2,7 @@
 
 Copyright (c) 2026, the kit's author. All rights reserved.
 
-This kit is shared privately with the people its author invited. You may install it, use it to make your own videos (including for your business), and change it for your own use. Please don't publish, resell or redistribute it, or share it beyond the people it was shared with, without the author's permission.
+You may install this kit, use it to make your own videos (including for your business), and change it for your own use. Please don't resell it, republish it as your own, or redistribute changed copies without the author's permission. Pointing people to this repository is fine.
 
 The videos you make with it are yours.
 
