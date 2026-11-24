@@ -1,0 +1,55 @@
+# Your own settings and anything made on your Mac stay out of git.
+studio.json
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+
+# Working and cache folders the tools make
+**/work/
+**/cache/
+**/cache.nosync/
+**/out/
+**/recordings/
+demo/footage/
+demo/output/
+samples/output/
+
+# Media never goes in the repo. Small kit graphics are allowed one by one below.
+*.mp4
+*.mov
+*.m4v
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.aif
+*.aiff
+*.flac
+*.ovsvoice
+*.jpg
+*.jpeg
+*.heic
+*.psd
+
+# Your brands live here too. The example brand is kept; add your own to git only if you mean to share them.
+brands/*
+!brands/example-brand/
+!brands/README.md
+brands/*/fonts/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Your own cards, classroom and ideas stay yours (the READMEs explain the formats)
+cards/*
+!cards/README.md
+classroom/*
+!classroom/README.md
+ideas/*
+!ideas/README.md

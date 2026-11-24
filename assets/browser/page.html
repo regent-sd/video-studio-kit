@@ -1,0 +1,682 @@
+<meta charset="utf-8">
+<title>Asset Library</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: sticky search bar; filter column on the left (a drawer on phones); virtualized grid or a plain list on the right. */
+:root {
+  --bg: #F4F4F1; --panel: #FFFFFF; --panel-2: #ECECE7; --line: #DDDDD6; --line-strong: #C4C4BB;
+  --text: #1C1C1A; --muted: #62625B; --accent: #2E5E8C; --accent-ink: #FFFFFF; --accent-weak: rgba(46, 94, 140, .10);
+  --chip: #E6E6E0; --chip-ink: #2A2A27; --chip-on: #2A2A27; --chip-on-ink: #F4F4F1;
+  --warn-bg: #F6E7C8; --warn: #6B4A0B; --info-bg: #E3E8EF; --info: #2D3C52; --focus: #2E5E8C;
+  --ph: #E9E9E4; --ph-ink: #6E6E66; --shade: rgba(10, 10, 10, .45); --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 6px 18px rgba(0, 0, 0, .05);
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141413; --panel: #1C1C1A; --panel-2: #252522; --line: #33332F; --line-strong: #4A4A44;
+  --text: #F1F1EC; --muted: #A9A9A0; --accent: #8DB6E0; --accent-ink: #0E1620; --accent-weak: rgba(141, 182, 224, .14);
+  --chip: #2A2A27; --chip-ink: #E4E4DD; --chip-on: #E4E4DD; --chip-on-ink: #1C1C1A;
+  --warn-bg: #3A2F17; --warn: #E8C77E; --info-bg: #232A34; --info: #D2DCE8; --focus: #8DB6E0;
+  --ph: #22221F; --ph-ink: #9C9C93; --shade: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #141413; --panel: #1C1C1A; --panel-2: #252522; --line: #33332F; --line-strong: #4A4A44;
+  --text: #F1F1EC; --muted: #A9A9A0; --accent: #8DB6E0; --accent-ink: #0E1620; --accent-weak: rgba(141, 182, 224, .14);
+  --chip: #2A2A27; --chip-ink: #E4E4DD; --chip-on: #E4E4DD; --chip-on-ink: #1C1C1A;
+  --warn-bg: #3A2F17; --warn: #E8C77E; --info-bg: #232A34; --info: #D2DCE8; --focus: #8DB6E0;
+  --ph: #22221F; --ph-ink: #9C9C93; --shade: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--text); }
+body { margin: 0; font: 14px/1.45 var(--sans); }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--panel); }
+a { color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--panel); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-block: 10px; }
+.brand { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; text-decoration: none; color: var(--text); }
+.brand b { font: 600 20px/1 var(--serif); letter-spacing: .01em; }
+.brand small { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.search { flex: 1 1 280px; min-width: 0; position: relative; }
+.search input { width: 100%; padding: 9px 12px 9px 34px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
+.search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; fill: none; stroke: var(--muted); stroke-width: 2; }
+.search input:not(:placeholder-shown) + kbd { display: none; }
+.search kbd { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: 11px var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 7px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-ink); }
+.btn { border: 1px solid var(--line-strong); background: var(--panel); border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--panel-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 4px 9px; font-size: 13px; }
+.only-phone { display: none; }
+.home { color: var(--muted); text-decoration: none; font-size: 13px; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; padding-block: 16px 40px; }
+aside#filters { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); align-self: start; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 4px; }
+.fgroup { border-bottom: 1px solid var(--line); padding: 10px 0; }
+.fgroup h3 { margin: 0 0 6px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; }
+.fgroup h3 button { border: 0; background: none; color: var(--accent); font-size: 11px; cursor: pointer; text-transform: none; letter-spacing: 0; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { border: 1px solid transparent; background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 3px 10px; cursor: pointer; font-size: 13px; display: inline-flex; gap: 6px; align-items: baseline; max-width: 100%; }
+.chip span.n { font-size: 11px; opacity: .7; font-variant-numeric: tabular-nums; }
+.chip span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-ink); }
+.chip.zero { opacity: .45; }
+.more { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 4px 0 0; font-size: 12px; }
+.toggle { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; cursor: pointer; }
+.toggle input { margin-top: 3px; accent-color: var(--accent); }
+.note { font-size: 12px; color: var(--muted); padding: 10px 0; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 12px; }
+.count { font-weight: 600; font-variant-numeric: tabular-nums; }
+.bar .spacer { flex: 1; }
+.bar label { color: var(--muted); font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.bar select { padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--panel); }
+.active { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.active:empty { display: none; }
+.active .chip { background: var(--accent-weak); color: var(--text); border-color: var(--line-strong); }
+.selbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--info-bg); color: var(--info); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
+
+#grid { position: relative; }
+.card { position: absolute; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; cursor: pointer; }
+.card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.card.selected { outline: 2px solid var(--accent); outline-offset: -1px; }
+.card .th { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: var(--panel-2); overflow: hidden; }
+.card .th img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.card .cap { padding: 7px 9px 8px; min-width: 0; }
+.card .nm { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .mt { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.card .pick { position: absolute; top: 6px; left: 6px; width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--accent); display: grid; place-items: center; font-size: 15px; line-height: 1; cursor: pointer; opacity: 0; }
+.card:hover .pick, .card:focus-within .pick, .card.selected .pick, .touch .card .pick { opacity: 1; }
+.card.selected .pick { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.card .badge { position: absolute; top: 6px; right: 6px; font-size: 11px; background: var(--shade); color: #FFFFFF; border-radius: 4px; padding: 1px 6px; }
+.ph { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: var(--ph); color: var(--ph-ink); }
+.ph .ext { font: 700 22px/1 var(--mono); letter-spacing: .04em; }
+.ph .ext.long { font-size: 15px; }
+.ph .kd { font-size: 12px; }
+.sprite { background-repeat: no-repeat; flex: none; }
+
+.listwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--panel-2); position: sticky; top: 0; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--accent-weak); }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.fold { color: var(--muted); max-width: 360px; overflow-wrap: anywhere; }
+td.nm { font-weight: 600; overflow-wrap: anywhere; min-width: 160px; }
+td.tg { color: var(--muted); max-width: 280px; }
+.empty { padding: 48px 16px; text-align: center; color: var(--muted); }
+
+#detail { position: fixed; inset: 0; z-index: 40; background: var(--shade); display: flex; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.dlg { background: var(--panel); color: var(--text); border-radius: 12px; width: min(1100px, 100%); max-height: 100%; overflow: auto; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); box-shadow: 0 20px 60px rgba(0, 0, 0, .3); }
+.dlg .pv { background: var(--panel-2); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; gap: 8px; min-height: 320px; }
+.dlg .pv img { max-height: 70vh; object-fit: contain; }
+.dlg .pv .ph { min-height: 300px; border-radius: 8px; }
+.dlg .pv small { color: var(--muted); }
+.dlg .info { padding: 18px 20px 20px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.dlg h2 { margin: 0; font: 600 20px/1.25 var(--serif); overflow-wrap: anywhere; text-wrap: balance; }
+.dlg .desc { margin: 0; font-size: 15px; }
+.dlg .desc.none { color: var(--muted); font-style: italic; }
+.dlg .acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.dlg .head { display: flex; gap: 8px; align-items: flex-start; }
+.dlg .head h2 { flex: 1; }
+.dlg .nav { display: flex; gap: 4px; }
+.warns { display: flex; flex-direction: column; gap: 4px; }
+.warn { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 5px 9px; font-size: 13px; }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 13px; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.copies { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.copy { border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.copy code { font: 12px var(--mono); overflow-wrap: anywhere; }
+.copy .tagline { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill { font-size: 11px; border-radius: 999px; padding: 1px 8px; background: var(--chip); color: var(--chip-ink); }
+.pill.lock { background: var(--info-bg); color: var(--info); }
+.pill.del { background: var(--warn-bg); color: var(--warn); }
+h4 { margin: 4px 0 0; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--chip-on); color: var(--chip-on-ink); padding: 8px 14px; border-radius: 8px; z-index: 60; box-shadow: var(--shadow); }
+#copybox { position: fixed; inset: 0; z-index: 70; background: var(--shade); display: flex; align-items: center; justify-content: center; padding: 16px; }
+#copybox .dlg { display: block; padding: 16px; width: min(640px, 100%); }
+#copybox textarea { width: 100%; height: 200px; font: 12px var(--mono); background: var(--bg); color: var(--text); border: 1px solid var(--line-strong); border-radius: 6px; }
+.scrim { display: none; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .only-phone { display: inline-flex; }
+  aside#filters { position: fixed; z-index: 35; top: 0; bottom: auto; left: 0; width: min(330px, 88vw); height: 100vh; height: 100dvh; max-height: none; background: var(--panel); padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 24px max(16px, env(safe-area-inset-left, 0px)); transform: translateX(-105%); transition: transform .2s; box-shadow: var(--shadow); }
+  body.filters-open aside#filters { transform: none; }
+  #closeFilters { position: sticky; bottom: 0; width: 100%; justify-content: center; margin-top: 8px; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  body.filters-open .scrim { display: block; position: fixed; inset: 0; z-index: 34; background: var(--shade); }
+  .dlg { grid-template-columns: minmax(0, 1fr); }
+  .dlg .pv { min-height: 200px; }
+  .search kbd { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="brand" id="brand" href="#"><b>Asset Library</b><small id="brandName"></small></a>
+  <div class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+    <input id="q" type="search" placeholder="Search names, folders, descriptions and tags" aria-label="Search" autocomplete="off">
+    <kbd>/</kbd>
+  </div>
+  <button class="btn only-phone" id="openFilters" type="button" aria-controls="filters">Filters</button>
+  <div class="seg" role="group" aria-label="View">
+    <button type="button" id="vGrid" aria-pressed="true">Grid</button><button type="button" id="vList" aria-pressed="false">List</button>
+  </div>
+  <a class="home" id="home" hidden>Studio</a>
+</div></header>
+
+<div class="wrap"><div class="layout">
+  <aside id="filters" aria-label="Filters">
+    <div class="fgroup" id="toggles">
+      <h3>Show</h3>
+      <label class="toggle"><input type="checkbox" id="tPeople"> <span>Hide anything with people visible</span></label>
+      <label class="toggle"><input type="checkbox" id="tRetired"> <span>Hide old branding</span></label>
+      <label class="toggle"><input type="checkbox" id="tReady"> <span>Only ready to post</span></label>
+      <label class="toggle"><input type="checkbox" id="tPreview"> <span>Only files with a preview</span></label>
+      <label class="toggle"><input type="checkbox" id="tAll"> <span>Show every copy, including _To Delete folders</span></label>
+    </div>
+    <div id="facets"></div>
+    <div class="note" id="dataNote"></div>
+    <button class="btn only-phone" id="closeFilters" type="button">Show results</button>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main" style="min-width:0">
+    <div class="bar">
+      <span class="count" id="count" aria-live="polite">Loading the catalog…</span>
+      <span class="spacer"></span>
+      <label for="sort">Sort <select id="sort">
+        <option value="new">Newest first</option><option value="old">Oldest first</option><option value="name">Name</option>
+        <option value="size">Largest first</option><option value="rating">Best rated first</option>
+      </select></label>
+      <button class="btn small" id="csv" type="button">Download CSV</button>
+      <button class="btn small" id="clearAll" type="button" hidden>Clear filters</button>
+    </div>
+    <div class="active" id="active"></div>
+    <div class="selbar" id="selbar" hidden>
+      <span id="selN"></span>
+      <button class="btn small" id="selCopy" type="button">Copy list for Claude</button>
+      <button class="btn small" id="selClear" type="button">Clear selection</button>
+    </div>
+    <div id="grid" role="list" aria-label="Assets"></div>
+    <div id="list" hidden></div>
+    <div class="empty" id="empty" hidden>Nothing matches. Try fewer words or clear a filter.</div>
+  </main>
+</div></div>
+
+<div id="detail" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle"></div>
+<div id="copybox" hidden role="dialog" aria-modal="true" aria-label="Copy this text"><div class="dlg">
+  <p style="margin:0 0 8px">Copying isn't allowed here. Select the text below and copy it yourself.</p>
+  <textarea id="copyText" readonly></textarea>
+  <div style="text-align:right;margin-top:8px"><button class="btn" id="copyClose" type="button">Done</button></div>
+</div></div>
+<div id="toast" hidden role="status"></div>
+
+<script>
+const CFG = /*CONFIG*/{};
+(function () {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nf = new Intl.NumberFormat('en-US');
+
+const KIND = { photo: 'Photo', graphic: 'Graphic', 'design-source': 'Design file', pdf: 'PDF', video: 'Video', audio: 'Audio',
+  doc: 'Document', font: 'Font', project: 'Project file', archive: 'Archive (zip)', other: 'Other' };
+const FLAG = { 'people-visible': 'People visible: ask before posting', 'customers-visible': 'Customers visible: ask before posting',
+  'kids-visible': 'Children visible: ask a parent before posting', 'prices-shown': 'Prices shown (may be out of date)',
+  'dated-info': 'Shows a date, hours or an offer that may have passed', 'old-logo': 'Old logo', 'other-brand': "Another company's brand is prominent",
+  'text-heavy': 'Mostly text', 'low-quality': 'Low quality (blurry, dark or small)', 'near-duplicate': 'One of several near-identical shots',
+  sensitive: 'Private information: never use it, and move it out of the marketing folders' };
+const BRAND = { current: "Today's look", retired: 'Old branding', neutral: 'No branding', unknown: 'Not sure' };
+const RATING = { 3: 'Hero shot', 2: 'Usable', 1: 'Weak' };
+const USE = { 'ready-to-post': 'Ready to post', raw: 'Raw', 'print-ready': 'Ready to print', 'source-file': 'Editable source', web: 'Made for the web', reference: 'Kept for reference' };
+const TAGNAME = { type: 'What it is', subject: 'Shows', setting: 'Setting', location: 'Location', item: 'Item', people: 'People named',
+  people_count: 'How many people', campaign: 'Campaign', year: 'Year', use: 'Use', rating: 'Rating' };
+const COUNT = { none: 'No one', one: 'One person', few: '2 to 4 people', group: '5 or more' };
+const words = (v) => String(v).replace(/-/g, ' ');
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const FACETS = [
+  ['kind', 'Kind', (v) => KIND[v] || cap(words(v))],
+  ['top', 'Top folder', (v) => v],
+  ['type', 'What it is', (v) => cap(words(v))],
+  ['subject', 'Shows', (v) => cap(words(v))],
+  ['setting', 'Setting', (v) => cap(words(v))],
+  ['location', 'Location', (v) => cap(words(v))],
+  ['campaign', 'Campaign', (v) => v],
+  ['year', 'Year', (v) => v],
+  ['use', 'Use', (v) => USE[v] || cap(words(v))],
+  ['rating', 'Rating', (v) => (RATING[v] ? `${v} · ${RATING[v]}` : v)],
+  ['brand', 'Branding', (v) => BRAND[v] || v],
+  ['orient', 'Shape', (v) => cap(v)],
+];
+const FKEYS = FACETS.map((f) => f[0]);
+const LONG = { top: 1, subject: 1, campaign: 1, year: 1 };
+const TOGGLES = { people: 'tPeople', retired: 'tRetired', ready: 'tReady', preview: 'tPreview' };
+
+let DATA = null, CONTENT = [], FOLD = [], ITEMS = [], VIEW = [], counts = {};
+const S = { q: '', f: {}, t: {}, all: false, sort: 'new', view: 'grid' };
+const expanded = {};
+const selected = new Set();
+let listShown = 300;
+
+function store(k, v) { try { if (v === undefined) return localStorage.getItem('assetlib.' + k); localStorage.setItem('assetlib.' + k, v); } catch (e) { return null; } }
+
+// ---------- hash: state <-> base32 (letters and digits only, so the link survives being shared)
+const B32 = 'abcdefghijklmnopqrstuvwxyz234567';
+function b32enc(str) {
+  const bytes = new TextEncoder().encode(str); let out = '', bits = 0, val = 0;
+  for (const b of bytes) { val = (val << 8) | b; bits += 8; while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; } }
+  if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+  return out;
+}
+function b32dec(s) {
+  const out = []; let bits = 0, val = 0;
+  for (const ch of s) { const i = B32.indexOf(ch); if (i < 0) throw new Error('bad'); val = (val << 5) | i; bits += 5; if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; } }
+  return new TextDecoder().decode(new Uint8Array(out));
+}
+function stateToHash() {
+  const o = {};
+  if (S.q) o.q = S.q;
+  const f = {}; for (const k in S.f) if (S.f[k].size) f[k] = [...S.f[k]];
+  if (Object.keys(f).length) o.f = f;
+  const t = Object.keys(S.t).filter((k) => S.t[k]); if (t.length) o.t = t;
+  if (S.all) o.a = 1;
+  if (S.sort !== 'new') o.s = S.sort;
+  if (S.view !== 'grid') o.v = S.view;
+  return Object.keys(o).length ? 'v1' + b32enc(JSON.stringify(o)) : '';
+}
+let lastHash = null;
+function writeHash() {
+  const h = stateToHash(); if (h === lastHash) return; lastHash = h;
+  try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) { try { location.hash = h; } catch (e2) { /* ignore */ } }
+}
+function readHash() {
+  const h = (location.hash || '').slice(1);
+  S.q = ''; S.f = {}; S.t = {}; S.all = false; S.sort = store('sort') || 'new'; S.view = store('view') || 'grid';
+  if (h.startsWith('v1')) {
+    try {
+      const o = JSON.parse(b32dec(h.slice(2)));
+      S.q = o.q || ''; for (const k in (o.f || {})) if (FKEYS.includes(k)) S.f[k] = new Set(o.f[k].map(String));
+      for (const k of (o.t || [])) if (TOGGLES[k]) S.t[k] = true;
+      S.all = !!o.a; if (o.s) S.sort = o.s; if (o.v) S.view = o.v;
+    } catch (e) { /* a broken link just opens the default view */ }
+  }
+  lastHash = h;
+}
+
+// ---------- data
+function prep(d) {
+  DATA = d;
+  const multi = (d.r || []).length > 1;
+  FOLD = d.f.map(([p, link]) => {
+    const parts = p ? p.split('/') : [];
+    const top = multi ? parts.slice(0, 2).join('/') : (parts[1] || '(top level)');
+    return { p, link, root: parts[0] || '', top, del: parts.slice(1).includes('_To Delete') };
+  });
+  CONTENT = d.a.map((c, i) => {
+    const tg = c.tg || {};
+    const mod = c.c.map((x) => x[3]).filter(Boolean).sort()[0] || '';
+    const date = c.tk || mod;
+    let orient = null;
+    if (c.w && c.h) { const r = c.w / c.h; orient = r > 1.05 ? 'landscape' : r < 0.95 ? 'portrait' : 'square'; }
+    const yr = tg.year ? String(tg.year) : (c.tk ? c.tk.slice(0, 4) : null);
+    const fl = c.fl || [];
+    const tagWords = [];
+    for (const k in tg) { const v = tg[k]; (Array.isArray(v) ? v : [v]).forEach((x) => tagWords.push(String(x), words(x))); }
+    return { i, c, tg, date, orient, yr, fl,
+      prev: !!(c.t || c.s),
+      people: fl.includes('people-visible') || fl.includes('customers-visible') || fl.includes('kids-visible'),
+      retired: c.bs === 'retired' || fl.includes('old-logo'),
+      ready: tg.use === 'ready-to-post',
+      text: [c.ds || '', tagWords.join(' '), fl.join(' '), fl.map((f) => FLAG[f] || '').join(' '), c.bs || '', KIND[c.k] || '', c.x].join(' ').toLowerCase() };
+  });
+}
+
+function buildItems() {
+  ITEMS = [];
+  for (const C of CONTENT) {
+    const cps = S.all ? C.c.c : C.c.c.filter((x) => !FOLD[x[0]].del);
+    if (!cps.length) continue;
+    const groups = S.all ? cps.map((x) => [x]) : [cps];
+    for (const g of groups) {
+      const tops = [...new Set(g.map((x) => FOLD[x[0]].top))];
+      const hay = (g.map((x) => FOLD[x[0]].p + '/' + x[1]).join(' ') + ' ' + C.text).toLowerCase();
+      const tg = C.tg;
+      const fv = {
+        kind: [C.c.k], top: tops, type: tg.type ? [tg.type] : [], subject: Array.isArray(tg.subject) ? tg.subject.map(String) : [],
+        setting: tg.setting ? [tg.setting] : [], location: tg.location ? [tg.location] : [], campaign: tg.campaign ? [String(tg.campaign)] : [],
+        year: C.yr ? [C.yr] : [], use: tg.use ? [tg.use] : [], rating: tg.rating ? [String(tg.rating)] : [], brand: C.c.bs ? [C.c.bs] : [],
+        orient: C.orient ? [C.orient] : [],
+      };
+      ITEMS.push({ C, cps: g, cp: g[0], hay, fv, name: g[0][1].toLowerCase() });
+    }
+  }
+}
+
+// ---------- filtering
+function run() {
+  const qs = S.q.toLowerCase().split(/\s+/).filter(Boolean);
+  const active = FKEYS.filter((k) => S.f[k] && S.f[k].size);
+  counts = {}; FKEYS.forEach((k) => (counts[k] = new Map()));
+  const allVals = {}; FKEYS.forEach((k) => (allVals[k] = new Map()));
+  VIEW = [];
+  for (const it of ITEMS) {
+    for (const k of FKEYS) for (const v of it.fv[k]) allVals[k].set(v, (allVals[k].get(v) || 0) + 1);
+    const C = it.C;
+    if (S.t.people && C.people) continue;
+    if (S.t.retired && C.retired) continue;
+    if (S.t.ready && !C.ready) continue;
+    if (S.t.preview && !C.prev) continue;
+    let ok = true;
+    for (const w of qs) if (!it.hay.includes(w)) { ok = false; break; }
+    if (!ok) continue;
+    let fails = 0, failK = null;
+    for (const k of active) {
+      const set = S.f[k];
+      if (!it.fv[k].some((v) => set.has(v))) { fails++; failK = k; if (fails > 1) break; }
+    }
+    if (fails > 1) continue;
+    for (const k of FKEYS) {
+      if (fails === 1 && k !== failK) continue;
+      for (const v of it.fv[k]) counts[k].set(v, (counts[k].get(v) || 0) + 1);
+    }
+    if (fails === 0) VIEW.push(it);
+  }
+  const by = {
+    new: (a, b) => (b.C.date || '').localeCompare(a.C.date || '') || a.name.localeCompare(b.name),
+    old: (a, b) => (a.C.date || '9').localeCompare(b.C.date || '9') || a.name.localeCompare(b.name),
+    name: (a, b) => a.name.localeCompare(b.name),
+    size: (a, b) => b.C.c.b - a.C.c.b,
+    rating: (a, b) => (b.C.tg.rating || 0) - (a.C.tg.rating || 0) || (b.C.date || '').localeCompare(a.C.date || ''),
+  };
+  VIEW.sort(by[S.sort] || by.new);
+  renderFacets(allVals);
+  renderActive();
+  const total = ITEMS.length;
+  $('count').textContent = `${nf.format(VIEW.length)} of ${nf.format(total)} ${S.all ? 'copies' : 'files'}`;
+  $('empty').hidden = VIEW.length > 0;
+  $('clearAll').hidden = !(S.q || active.length || Object.values(S.t).some(Boolean) || S.all);
+  listShown = 300;
+  renderView(true);
+  writeHash();
+}
+
+function renderFacets(allVals) {
+  let html = '';
+  for (const [k, title, label] of FACETS) {
+    const all = allVals[k];
+    if (!all.size) continue;
+    const sel = S.f[k] || new Set();
+    let vals = [...all.keys()];
+    if (k === 'year') vals.sort((a, b) => b.localeCompare(a));
+    else if (k === 'rating') vals.sort((a, b) => b - a);
+    else vals.sort((a, b) => (counts[k].get(b) || 0) - (counts[k].get(a) || 0) || (all.get(b) - all.get(a)) || String(a).localeCompare(String(b)));
+    const lim = LONG[k] && !expanded[k] ? 8 : Infinity;
+    const shown = vals.filter((v, i) => i < lim || sel.has(v));
+    html += `<div class="fgroup"><h3>${esc(title)}${sel.size ? `<button type="button" data-clear="${k}">Clear</button>` : ''}</h3><div class="chips">`;
+    for (const v of shown) {
+      const n = counts[k].get(v) || 0;
+      html += `<button type="button" class="chip${n || sel.has(v) ? '' : ' zero'}" data-f="${k}" data-v="${esc(v)}" aria-pressed="${sel.has(v)}" title="${esc(label(v))}"><span class="t">${esc(label(v))}</span><span class="n">${nf.format(n)}</span></button>`;
+    }
+    html += '</div>';
+    if (vals.length > shown.length || expanded[k]) html += `<button type="button" class="more" data-more="${k}">${expanded[k] ? 'Show fewer' : `Show all ${vals.length}`}</button>`;
+    html += '</div>';
+  }
+  $('facets').innerHTML = html;
+}
+
+function renderActive() {
+  let h = '';
+  if (S.q) h += `<button type="button" class="chip" data-unq="1">“${esc(S.q)}” ✕</button>`;
+  for (const [k, title, label] of FACETS) for (const v of (S.f[k] || [])) h += `<button type="button" class="chip" data-f="${k}" data-v="${esc(v)}" aria-pressed="true">${esc(title)}: ${esc(label(v))} ✕</button>`;
+  $('active').innerHTML = h;
+}
+
+// ---------- previews
+function fmtBytes(b) { if (b >= 1e9) return (b / 1e9).toFixed(1) + ' GB'; if (b >= 1e6) return (b / 1e6).toFixed(1) + ' MB'; if (b >= 1e3) return Math.round(b / 1e3) + ' KB'; return b + ' B'; }
+function placeholder(c) { return `<div class="ph"><span class="ext${(c.x || '').length > 4 ? ' long' : ''}">${esc((c.x || '?').toUpperCase().slice(0, 9))}</span><span class="kd">${esc(KIND[c.k] || c.k)}</span></div>`; }
+function preview(c, bw, bh, big) {
+  if (c.t && CFG.mode === 'local') return `<img src="${esc(CFG.thumb + c.t)}" alt="" loading="lazy" decoding="async"${big ? ` style="width:auto;max-width:100%"` : ''}>`;
+  if (c.s && DATA.sh) {
+    const [sh, x, y, w, h] = c.s, sheet = DATA.sh[sh];
+    if (sheet) {
+      const k = Math.min(bw / w, bh / h);
+      return `<div class="sprite" role="img" aria-label="Preview" style="width:${(w * k).toFixed(1)}px;height:${(h * k).toFixed(1)}px;background-image:url('${esc(CFG.sprites + sheet[0])}');background-size:${(sheet[1] * k).toFixed(1)}px ${(sheet[2] * k).toFixed(1)}px;background-position:${(-x * k).toFixed(1)}px ${(-y * k).toFixed(1)}px"></div>`;
+    }
+  }
+  return placeholder(c);
+}
+
+// ---------- grid (virtualized)
+const GAP = 12;
+let geo = null, lastRange = '';
+function layoutGrid() {
+  const W = $('grid').clientWidth || 600;
+  const min = W < 500 ? 150 : 190;
+  const cols = Math.max(1, Math.floor((W + GAP) / (min + GAP)));
+  const cw = (W - GAP * (cols - 1)) / cols;
+  const thH = Math.round(cw * 0.75), ch = thH + 52;
+  geo = { cols, cw, ch, thH, rows: Math.ceil(VIEW.length / cols) };
+  $('grid').style.height = (geo.rows ? geo.rows * (ch + GAP) - GAP : 0) + 'px';
+}
+function renderGrid(force) {
+  if (!geo) layoutGrid();
+  const g = $('grid'), top = g.getBoundingClientRect().top, vh = window.innerHeight;
+  const rowH = geo.ch + GAP;
+  const r0 = Math.max(0, Math.floor(-top / rowH) - 2), r1 = Math.min(geo.rows, Math.ceil((vh - top) / rowH) + 2);
+  const key = `${r0}-${r1}-${geo.cols}`;
+  if (!force && key === lastRange) return;
+  lastRange = key;
+  let h = '';
+  for (let i = r0 * geo.cols; i < Math.min(VIEW.length, r1 * geo.cols); i++) {
+    const it = VIEW[i], c = it.C.c, r = Math.floor(i / geo.cols), col = i % geo.cols;
+    const n = S.all ? 0 : it.cps.length;
+    const meta = [(c.x || KIND[c.k] || '').toUpperCase(), fmtBytes(c.b), c.w && c.h ? `${c.w}×${c.h}` : '', it.C.date ? it.C.date.slice(0, 4) : ''].filter(Boolean).join(' · ');
+    const isSel = selected.has(itemKey(it));
+    h += `<div class="card${isSel ? ' selected' : ''}" role="listitem" tabindex="0" data-i="${i}" style="left:${(col * (geo.cw + GAP)).toFixed(1)}px;top:${r * rowH}px;width:${geo.cw.toFixed(1)}px;height:${geo.ch}px" aria-label="${esc(it.cp[1])}">`
+      + `<div class="th">${preview(c, geo.cw, geo.thH)}</div>`
+      + `<div class="cap"><div class="nm" title="${esc(it.cp[1])}">${esc(it.cp[1])}</div><div class="mt">${esc(meta)}</div></div>`
+      + `<button type="button" class="pick" data-pick="${i}" aria-pressed="${isSel}" aria-label="Select ${esc(it.cp[1])}">${isSel ? '✓' : '+'}</button>`
+      + (n > 1 ? `<span class="badge">${n} copies</span>` : '') + '</div>';
+  }
+  g.innerHTML = h;
+}
+
+// ---------- list
+function tagSummary(C) {
+  const out = [];
+  for (const k in C.tg) { const v = C.tg[k]; out.push((Array.isArray(v) ? v : [v]).map(words).join(', ')); }
+  return out.join(' · ');
+}
+function renderList() {
+  const rows = VIEW.slice(0, listShown).map((it, i) => {
+    const c = it.C.c;
+    return `<tr tabindex="0" data-i="${i}"><td class="nm">${esc(it.cp[1])}${!S.all && it.cps.length > 1 ? ` <span class="pill">${it.cps.length} copies</span>` : ''}</td><td>${esc(KIND[c.k] || c.k)}</td>`
+      + `<td class="fold">${esc(FOLD[it.cp[0]].p)}</td><td class="num">${fmtBytes(c.b)}</td><td class="num">${esc(it.C.date || '')}</td><td class="tg">${esc(tagSummary(it.C))}</td></tr>`;
+  }).join('');
+  $('list').innerHTML = `<div class="listwrap"><table><thead><tr><th>Name</th><th>Kind</th><th>Folder</th><th>Size</th><th>Date</th><th>Tags</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    + (VIEW.length > listShown ? `<p style="text-align:center"><button class="btn" type="button" id="listMore">Show ${Math.min(300, VIEW.length - listShown)} more (${nf.format(VIEW.length - listShown)} left)</button></p>` : '');
+}
+
+function renderView(reset) {
+  const grid = S.view === 'grid';
+  $('grid').hidden = !grid; $('list').hidden = grid;
+  $('vGrid').setAttribute('aria-pressed', grid); $('vList').setAttribute('aria-pressed', !grid);
+  if (grid) { layoutGrid(); lastRange = ''; renderGrid(true); } else renderList();
+  renderSel();
+}
+
+// ---------- detail
+let cur = -1, lastFocus = null;
+const fileLink = (cp) => cp[5] || null;
+const folderLink = (cp) => FOLD[cp[0]].link || null;
+const pathOf = (cp) => (FOLD[cp[0]].p ? FOLD[cp[0]].p + '/' : '') + cp[1];
+const fullPath = (cp) => { const f = FOLD[cp[0]], base = DATA.rp && DATA.rp[f.root]; return base ? base + pathOf(cp).slice(f.root.length) : null; };
+const forClaude = (cp) => `Asset: ${fullPath(cp) || pathOf(cp)}` + (fileLink(cp) ? ` (${fileLink(cp)})` : '');
+function fmtDur(s) { const m = Math.floor(s / 60), r = Math.round(s % 60); return m ? `${m} min ${r} s` : `${r} s`; }
+function tagValue(k, v) {
+  const one = (x) => k === 'use' ? (USE[x] || words(x)) : k === 'rating' ? `${x} (${RATING[x] || ''})` : k === 'people_count' ? (COUNT[x] || x) : (k === 'item' || k === 'people' || k === 'campaign') ? String(x) : words(x);
+  return (Array.isArray(v) ? v : [v]).map(one).join(', ');
+}
+function openDetail(i) {
+  if (i < 0 || i >= VIEW.length) return;
+  if (cur < 0) lastFocus = document.activeElement;
+  cur = i;
+  const it = VIEW[i], C = it.C, c = C.c, cp = it.cp;
+  const fl = folderLink(cp);
+  const bw = Math.min(560, window.innerWidth - 64), bh = Math.min(520, window.innerHeight * 0.6);
+  let pv = preview(c, bw, bh, true);
+  let note = '';
+  if (c.s && CFG.mode !== 'local') note = '<small>Small preview. Open the file itself for full size.</small>';
+  if (!c.t && !c.s) note = '<small>No preview yet.</small>';
+  const kv = [['Kind', KIND[c.k] || c.k], ['Size', fmtBytes(c.b)]];
+  if (c.w && c.h) kv.push(['Dimensions', `${nf.format(c.w)} × ${nf.format(c.h)}${c.k === 'pdf' || c.k === 'design-source' ? ' pt' : ' px'}`]);
+  if (c.d) kv.push(['Length', fmtDur(c.d)]);
+  if (c.p) kv.push(['Pages', c.p]);
+  if (c.tk) kv.push(['Date taken', c.tk]);
+  kv.push(['Last changed', cp[3] || '']);
+  if (c.bs) kv.push(['Branding', BRAND[c.bs] || c.bs]);
+  for (const k in C.tg) { const v = C.tg[k]; if (v == null || v === '' || (Array.isArray(v) && !v.length)) continue; kv.push([TAGNAME[k] || cap(words(k)), tagValue(k, v)]); }
+  const others = S.all ? C.c.c.filter((x) => x !== cp) : it.cps.slice(1).concat(C.c.c.filter((x) => FOLD[x[0]].del && !it.cps.includes(x)));
+  const copyRow = (x) => {
+    const f = FOLD[x[0]], lk = folderLink(x);
+    return `<div class="copy"><code>${esc(pathOf(x))}</code><div class="tagline">${x[4] ? '<span class="pill lock">Locked: don’t move or rename</span>' : ''}${f.del ? '<span class="pill del">In _To Delete</span>' : ''}</div>`
+      + `<div class="acts">${fileLink(x) ? `<a class="btn small" href="${esc(fileLink(x))}" target="_blank" rel="noopener">Open</a>` : ''}${lk ? `<a class="btn small" href="${esc(lk)}" target="_blank" rel="noopener">Folder</a>` : ''}<button class="btn small" type="button" data-copy="${esc(fullPath(x) || pathOf(x))}">Copy path</button><button class="btn small" type="button" data-copy="${esc(forClaude(x))}">Copy for Claude</button></div></div>`;
+  };
+  $('detail').innerHTML = `<div class="dlg"><div class="pv">${pv}${note}</div><div class="info">
+    <div class="head"><h2 id="dTitle">${esc(cp[1])}</h2><div class="nav"><button class="btn small" type="button" id="dPrev" aria-label="Previous">←</button><button class="btn small" type="button" id="dNext" aria-label="Next">→</button><button class="btn small" type="button" id="dClose" aria-label="Close">✕</button></div></div>
+    <p class="desc${c.ds ? '' : ' none'}">${c.ds ? esc(c.ds) : 'Not described yet.'}</p>
+    ${C.fl.length ? `<div class="warns">${C.fl.map((f) => `<div class="warn">${esc(FLAG[f] || words(f))}</div>`).join('')}</div>` : ''}
+    <div class="acts">${fileLink(cp) ? `<a class="btn primary" href="${esc(fileLink(cp))}" target="_blank" rel="noopener">Open in Drive</a>` : ''}${fl ? `<a class="btn" href="${esc(fl)}" target="_blank" rel="noopener">Open folder</a>` : ''}
+      <button class="btn${fileLink(cp) ? '' : ' primary'}" type="button" data-copy="${esc(fullPath(cp) || pathOf(cp))}">Copy path</button><button class="btn" type="button" data-copy="${esc(forClaude(cp))}">Copy for Claude</button></div>
+    <div><h4>Where it is</h4><div class="copies"><div class="copy"><code>${esc(pathOf(cp))}</code><div class="tagline">${cp[4] ? '<span class="pill lock">Locked: don’t move or rename</span>' : ''}${FOLD[cp[0]].del ? '<span class="pill del">In _To Delete</span>' : ''}</div></div></div></div>
+    <dl class="kv">${kv.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('')}</dl>
+    ${others.length ? `<div><h4>${others.length} other ${others.length === 1 ? 'copy' : 'copies'} of this exact file</h4><div class="copies">${others.map(copyRow).join('')}</div></div>` : ''}
+  </div></div>`;
+  $('detail').hidden = false;
+  $('dPrev').disabled = i === 0; $('dNext').disabled = i === VIEW.length - 1;
+  $('dClose').focus();
+}
+function closeDetail() { $('detail').hidden = true; $('detail').innerHTML = ''; cur = -1; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+
+// ---------- copy, selection, csv
+let toastT = 0;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 1800); }
+function copy(text, msg) {
+  const fallback = () => { $('copyText').value = text; $('copybox').hidden = false; $('copyText').focus(); $('copyText').select(); };
+  try { navigator.clipboard.writeText(text).then(() => toast(msg || 'Copied'), fallback); } catch (e) { fallback(); }
+}
+const itemKey = (it) => it.cp[2];
+function renderSel() {
+  $('selbar').hidden = !selected.size;
+  $('selN').textContent = `${selected.size} selected`;
+}
+function toggleSel(i) {
+  const k = itemKey(VIEW[i]);
+  if (selected.has(k)) selected.delete(k); else selected.add(k);
+  renderSel(); lastRange = ''; renderGrid(true);
+}
+function selectedLines() {
+  const byId = new Map(); for (const it of ITEMS) byId.set(itemKey(it), it);
+  return [...selected].map((k) => byId.get(k)).filter(Boolean).map((it) => forClaude(it.cp)).join('\n');
+}
+function csvText() {
+  const q = (s) => `"${String(s == null ? '' : s).replace(/"/g, '""')}"`;
+  const lines = [['Name', 'Kind', 'Folder', 'Size (MB)', 'Date', 'Copies', 'Description', 'Tags', 'Flags', 'Branding', 'Link', 'ID'].map(q).join(',')];
+  for (const it of VIEW) {
+    const c = it.C.c;
+    lines.push([it.cp[1], KIND[c.k] || c.k, FOLD[it.cp[0]].p, (c.b / 1e6).toFixed(2), it.C.date, it.cps.length, c.ds, tagSummary(it.C), (c.fl || []).join(', '), c.bs, fileLink(it.cp) || fullPath(it.cp) || '', it.cp[2]].map(q).join(','));
+  }
+  return lines.join('\r\n');
+}
+
+// ---------- events
+let qT = 0;
+$('q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => { S.q = $('q').value.trim(); run(); }, 90); });
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, [data-i], a');
+  if (!t) { if (e.target.id === 'detail') closeDetail(); if (e.target.id === 'scrim') document.body.classList.remove('filters-open'); return; }
+  if (t.dataset.f) { const k = t.dataset.f, v = t.dataset.v; const s = S.f[k] || (S.f[k] = new Set()); s.has(v) ? s.delete(v) : s.add(v); run(); return; }
+  if (t.dataset.clear) { delete S.f[t.dataset.clear]; run(); return; }
+  if (t.dataset.more) { expanded[t.dataset.more] = !expanded[t.dataset.more]; run(); return; }
+  if (t.dataset.unq) { S.q = ''; $('q').value = ''; run(); return; }
+  if (t.dataset.pick !== undefined) { e.stopPropagation(); toggleSel(+t.dataset.pick); return; }
+  if (t.dataset.copy !== undefined) { copy(t.dataset.copy); return; }
+  if (t.dataset.i !== undefined && !t.closest('#detail')) { openDetail(+t.dataset.i); return; }
+  switch (t.id) {
+    case 'dClose': closeDetail(); break;
+    case 'dPrev': openDetail(cur - 1); break;
+    case 'dNext': openDetail(cur + 1); break;
+    case 'vGrid': S.view = 'grid'; store('view', 'grid'); renderView(); writeHash(); break;
+    case 'vList': S.view = 'list'; store('view', 'list'); renderView(); writeHash(); break;
+    case 'listMore': listShown += 300; renderList(); break;
+    case 'clearAll': S.q = ''; $('q').value = ''; S.f = {}; S.t = {}; S.all = false; syncControls(); buildItems(); run(); break;
+    case 'selCopy': copy(selectedLines(), `Copied ${selected.size} ${selected.size === 1 ? 'line' : 'lines'}`); break;
+    case 'selClear': selected.clear(); renderSel(); lastRange = ''; renderGrid(true); break;
+    case 'openFilters': document.body.classList.add('filters-open'); break;
+    case 'closeFilters': document.body.classList.remove('filters-open'); break;
+    case 'copyClose': $('copybox').hidden = true; break;
+    case 'csv':
+      if (CFG.mode === 'local') {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(['﻿' + csvText()], { type: 'text/csv' }));
+        a.download = 'asset-library.csv'; document.body.appendChild(a); a.click(); a.remove();
+      } else copy(csvText(), `Copied ${nf.format(VIEW.length)} rows; paste into Google Sheets`);
+      break;
+    case 'brand': e.preventDefault(); $('clearAll').click(); break;
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (!$('detail').hidden) {
+    if (e.key === 'Escape') closeDetail();
+    else if (e.key === 'ArrowLeft') openDetail(cur - 1);
+    else if (e.key === 'ArrowRight') openDetail(cur + 1);
+    return;
+  }
+  if (e.key === 'Escape' && !$('copybox').hidden) { $('copybox').hidden = true; return; }
+  if (e.key === 'Escape') document.body.classList.remove('filters-open');
+  if (e.key === '/' && document.activeElement !== $('q')) { e.preventDefault(); $('q').focus(); return; }
+  const row = e.target.closest && e.target.closest('[data-i]');
+  if (row && (e.key === 'Enter' || e.key === ' ') && e.target === row) { e.preventDefault(); openDetail(+row.dataset.i); }
+});
+for (const [k, id] of Object.entries(TOGGLES)) $(id).addEventListener('change', () => { S.t[k] = $(id).checked; run(); });
+$('tAll').addEventListener('change', () => { S.all = $('tAll').checked; buildItems(); run(); });
+$('sort').addEventListener('change', () => { S.sort = $('sort').value; store('sort', S.sort); run(); });
+let scT = 0;
+window.addEventListener('scroll', () => { if (S.view === 'grid' && !scT) scT = requestAnimationFrame(() => { scT = 0; renderGrid(); }); }, { passive: true });
+window.addEventListener('resize', () => { if (S.view === 'grid') { layoutGrid(); lastRange = ''; renderGrid(true); } });
+window.addEventListener('hashchange', () => { if ((location.hash || '').slice(1) === lastHash) return; readHash(); syncControls(); buildItems(); run(); });
+if ('ontouchstart' in window) document.documentElement.classList.add('touch');
+
+function syncControls() {
+  $('q').value = S.q;
+  for (const [k, id] of Object.entries(TOGGLES)) $(id).checked = !!S.t[k];
+  $('tAll').checked = S.all; $('sort').value = S.sort;
+}
+
+// ---------- start
+if (CFG.mode === 'local') { const h = $('home'); h.href = CFG.home || '/studio'; h.hidden = false; }
+else $('csv').textContent = 'Copy as CSV';
+readHash(); syncControls();
+fetch(CFG.data).then((r) => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json(); }).then((d) => {
+  if (d.b) $('brandName').textContent = d.b;
+  if (d.empty) { $('count').textContent = 'No catalog yet'; $('empty').hidden = false; $('empty').textContent = d.empty; $('dataNote').textContent = d.empty; return; }
+  prep(d);
+  const tagged = CONTENT.filter((C) => C.c.ds).length, prev = CONTENT.filter((C) => C.prev).length;
+  $('dataNote').textContent = `${nf.format(CONTENT.length)} unique files; ${nf.format(prev)} with a preview, ${nf.format(tagged)} described so far.`
+    + (tagged ? '' : ' Search covers names and folders until descriptions and tags are added.') + (d.g ? ` Catalog of ${d.g.slice(0, 10)}.` : '')
+    + ' Read the warnings on a file before you post it anywhere.';
+  buildItems(); run();
+}).catch((err) => { $('count').textContent = 'The catalog didn’t load.'; $('empty').hidden = false; $('empty').textContent = `Couldn’t load the asset list (${err.message}). Reload the page to try again.`; });
+})();
+</script>

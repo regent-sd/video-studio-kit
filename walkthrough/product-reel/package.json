@@ -1,0 +1,27 @@
+{
+  "name": "product-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A short vertical product reel: headlines, screen clips in a device frame, voiceover and music, in your brand.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.545",
+    "@remotion/fonts": "4.0.545",
+    "@remotion/media": "4.0.545",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.545"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render ProductReel out/reel.mp4",
+    "check": "tsc"
+  }
+}

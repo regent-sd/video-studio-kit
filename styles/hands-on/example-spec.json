@@ -1,0 +1,31 @@
+{
+  "name": "Mug_Start_To_Finish_HandsOn",
+  "notes": "Example for the demo shoot (demo/README.md): the narration on the talking take, laid over the hands at work, line by line. Each segment's sound is cut by what's said ('say'), so no word is clipped. The hook, captions and tag are written for the example: flag text like this before posting.",
+  "shoot": "Demo Shoot",
+  "sources": {
+    "talk": {"path": "Camera/talking-head.mp4", "camera": "cam"},
+    "knead": {"path": "Camera/hands-kneading.mp4", "camera": "cam"},
+    "wheel": {"path": "Camera/hands-wheel.mp4", "camera": "cam"},
+    "carve": {"path": "Camera/hands-carving.mp4", "camera": "cam"},
+    "glaze": {"path": "Camera/glaze-pour.mp4", "camera": "cam"},
+    "cups": {"path": "Camera/cups-detail.mp4", "camera": "cam"},
+    "tea": {"path": "Camera/tea-pour.mp4", "camera": "cam"}
+  },
+  "caption_style": "block",
+  "music_level": 0.30,
+  "voice_duck": 0.10,
+  "segments": [
+    {"src": "talk", "say": ["here's how", "finish"], "voice": true, "subs": true, "caption_y": 1420,
+     "fx": [{"type": "hook", "text": "How a mug|gets made", "start": 0.0, "end": 2.2, "panel": true}]},
+    {"src": "knead", "a": 2.0, "audio": {"src": "talk", "say": ["first", "air out"]}, "voice": true, "subs": true,
+     "fx": [{"type": "tag", "text": "by hand", "start": 0.3}]},
+    {"src": "wheel", "a": 4.0, "audio": {"src": "talk", "say": ["then it goes", "steady speed"]}, "voice": true, "subs": true},
+    {"src": "carve", "a": 6.0, "audio": {"src": "talk", "say": ["once it's firm", "details"]}, "voice": true, "subs": true},
+    {"src": "glaze", "a": 8.0, "audio": {"src": "talk", "say": ["the glaze", "pour"]}, "voice": true, "subs": true},
+    {"src": "cups", "a": 0.5, "audio": {"src": "talk", "say": ["after the", "shelf"]}, "voice": true, "subs": true},
+    {"src": "tea", "a": 2.0, "audio": {"src": "talk", "say": ["the best part", "yourself"]}, "voice": true, "subs": true},
+    {"src": "talk", "say": ["go make", "week"], "voice": true, "subs": true, "caption_y": 1420},
+    {"src": "cups", "a": 3.0, "b": 5.6, "mute": true}
+  ],
+  "fx": [{"type": "endcard", "lines": "Made by hand", "start": -2.6}]
+}

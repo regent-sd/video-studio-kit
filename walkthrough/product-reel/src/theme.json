@@ -1,0 +1,23 @@
+{
+  "_about": "Written by walkthrough/rig/new_reel.py from brands/<brand>/brand.json. Run it again after changing the brand. These defaults are the example brand with system fonts.",
+  "brand": "example-brand",
+  "wordmark": "Mossy",
+  "logo": "",
+  "colors": {
+    "background": "#F6F1E9",
+    "surface": "#FFFFFF",
+    "text": "#2B2118",
+    "muted": "#8C7B6B",
+    "accent": "#C8642D",
+    "highlight": "#EBD9B4",
+    "dark": "#1C1916",
+    "dark_surface": "#2A2622",
+    "on_dark": "#F6F1E9",
+    "on_accent": "#2B2118"
+  },
+  "fonts": {
+    "title": { "family": "ui-serif, Georgia, serif", "file": "", "weight": 800 },
+    "heading": { "family": "-apple-system, sans-serif", "file": "", "weight": 600 },
+    "body": { "family": "-apple-system, sans-serif", "file": "", "weight": 500 }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "_about": "Copy this file to studio.json and change the paths. studio.json stays on your Mac (it's in .gitignore). Paths may start with ~.",
+
+  "owner": "",
+  "_owner": "Your first name. Guides say 'ask <owner>' and the Studio page greets you. Leave empty to be called 'you'.",
+
+  "content_root": "~/Movies/Video Studio",
+  "_content_root": "Where your shoots live: one folder per shoot, named by the first day filmed, e.g. '2026-03-14 Kitchen Remodel'. A synced drive folder works (Google Drive, Dropbox), but keep it out of iCloud-synced Documents.",
+
+  "default_brand": "example-brand",
+  "_default_brand": "The folder name in brands/ used when a video doesn't say which brand it's for.",
+
+  "sound_library": "~/Music/Sound Effects",
+  "_sound_library": "Your sound-effect recordings (setup/SOUND-LIBRARY.md).",
+
+  "music_library": "~/Music/Video Music",
+  "_music_library": "Licensed music tracks you've picked. Each video gets its own track.",
+
+  "asset_roots": [],
+  "_asset_roots": "Folders the Asset Library catalogs: photos, logos, menus, print pieces. Empty = no Asset Library yet (assets/README.md).",
+
+  "asset_library_dir": "~/Movies/Video Studio/_Asset Library",
+  "_asset_library_dir": "Where the Asset Library keeps its catalog and move log.",
+
+  "asset_never_move": [],
+  "_asset_never_move": "Folders inside your asset roots that the Asset Library must never move or rename (shared with someone else, for example).",
+
+  "asset_exclude": [],
+  "_asset_exclude": "Folders inside your asset roots to leave out of the catalog.",
+
+  "asset_cache_dir": "",
+  "_asset_cache_dir": "Where previews are cached. Empty = <asset_library_dir>/cache.nosync (the .nosync name keeps iCloud away).",
+
+  "voice": {
+    "api": "http://127.0.0.1:3900",
+    "profile_id": "",
+    "name": "",
+    "engine": "voxcpm2",
+    "seed": null,
+    "_about": "Your VoiceStudio voice clone (setup/VOICE-STUDIO.md). profile_id comes from VoiceStudio; leave empty until you've made one. engine: keep voxcpm2 (free for commercial use). seed: a take's seed to repeat its delivery, or null."
+  },
+
+  "walkthrough": {
+    "work_dir": "~/Movies/Walkthroughs",
+    "base_url": "http://127.0.0.1:5199",
+    "test_hosts": [],
+    "app_env_file": "",
+    "app_env_require": {},
+    "login": null,
+    "browser_channel": "chrome",
+    "timezone": "",
+    "hyperframes_version": "0.9.40",
+    "_about": "Product walkthrough videos (walkthrough/README.md, 'Settings'). base_url must be your app on localhost or a test host listed in test_hosts, never production. The default points at the bundled demo app."
+  },
+
+  "review_port": 8765,
+
+  "work_dir": "",
+  "_work_dir": "Where the builders keep their work folders (renders in progress, build records, caches). Empty = inside each style's folder in the kit (kept out of git). Point it somewhere roomy if the kit's drive is small.",
+
+  "timezone": "",
+  "_timezone": "Your time zone, e.g. \"America/Chicago\", for dates on log cards. Empty = this Mac's.",
+
+  "whisper_model": "~/.cache/whisper.cpp/ggml-base.en.bin",
+  "whisper_language": "en",
+  "_whisper": "The transcription model and language. base.en is fast and good for English; a bigger or multilingual model works too (setup/INSTALL.md, step 4).",
+
+  "people": [],
+  "_people": "First names of people who often appear (you, a partner, staff who agreed). Log cards and footage search use them. Only people who are OK being named."
+}

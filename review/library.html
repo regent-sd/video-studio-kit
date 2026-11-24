@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Footage Log</title>
+<style>
+:root {
+  /* Light theme, the same colours as the Studio page. */
+  --bg: #f5f3ef; --panel: #ffffff; --panel-2: #f1eee9; --panel-3: #e9e5de; --panel-hover: #fbf9f5;
+  --line: #e0dcd4; --line-soft: #ebe8e1; --line-strong: #c4bfb5;
+  --text: #1d1e21; --muted: #5d6068; --faint: #72757e;
+  --accent: #b84a16; --accent-bright: #e8743b; --accent-ink: #ffffff; --accent-weak: rgba(232, 116, 59, .13);
+  --done: #23774a; --done-weak: rgba(35, 119, 74, .12);
+  --warn: #8a5a00; --warn-weak: rgba(224, 179, 65, .22); --star: #b97a00;
+  --info: #2a62b8; --info-weak: rgba(42, 98, 184, .10);
+  --shadow: 0 1px 2px rgba(30, 25, 15, .05);
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--accent); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .small { font-size: 12px; }
+
+.topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+  border-bottom: 1px solid var(--line); background: var(--panel); min-height: 52px; flex-wrap: wrap; }
+.brand { font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.brand i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-bright); display: inline-block; }
+.tabs { display: flex; gap: 4px; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 6px 10px; color: var(--muted); font-weight: 600; }
+.tabs button.on { color: var(--text); border-bottom-color: var(--accent-bright); }
+.tabs .count { color: var(--accent); margin-left: 4px; font-weight: 600; }
+.spacer { flex: 1; }
+.ghost { border: 1px solid var(--line); background: var(--panel-2); border-radius: 7px; padding: 5px 11px; text-decoration: none; color: var(--text); }
+.ghost:hover { border-color: var(--line-strong); background: var(--panel-3); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 14px 16px 6px; max-width: 1180px; margin: 0 auto; }
+.controls input[type=search] { flex: 1 1 260px; max-width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; outline: none; }
+.controls input[type=search]:focus { border-color: var(--accent); }
+select, .controls input[type=date], .vrow input { background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 5px 8px; outline: none; }
+select:focus, .vrow input:focus { border-color: var(--accent); }
+label.check { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.resultline { max-width: 1180px; margin: 0 auto; padding: 4px 16px 10px; color: var(--muted); font-size: 12.5px; }
+main { max-width: 1180px; margin: 0 auto; padding: 0 16px 60px; }
+.empty { color: var(--muted); padding: 30px 0; }
+
+/* clips */
+.clip { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+.chead { display: flex; gap: 12px; padding: 12px 14px; cursor: pointer; align-items: flex-start; }
+.chead:hover { background: var(--panel-hover); }
+.cthumb { flex: none; width: 112px; height: 112px; border-radius: 7px; background: #000 center/cover no-repeat; }
+.cmain { flex: 1; min-width: 0; }
+.cname { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.cname .file { font: 12px var(--mono); color: var(--muted); }
+.cmeta { color: var(--muted); font-size: 12.5px; margin: 2px 0 6px; }
+.csum { margin: 0 0 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font-size: 11.5px; border-radius: 99px; padding: 1px 8px; background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); }
+.chip.flag { color: var(--warn); border-color: rgba(224,179,65,.45); background: var(--warn-weak); }
+.chip.use { color: var(--info); border-color: rgba(111,159,224,.45); background: var(--info-weak); }
+.chip.used { color: var(--done); border-color: rgba(93,179,126,.45); background: var(--done-weak); }
+.chip.fresh { color: var(--accent); border-color: rgba(232,116,59,.5); background: var(--accent-weak); }
+.chip.person { color: var(--text); }
+.stars { color: var(--star); letter-spacing: 1px; font-size: 12px; }
+.moments { border-top: 1px solid var(--line); }
+.moment { display: grid; grid-template-columns: 132px 1fr auto; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line-soft); align-items: start; }
+.moment:first-child { border-top: 0; }
+.moment.hit { background: rgba(232, 116, 59, .07); }
+.mthumb { width: 132px; aspect-ratio: 16/10; object-fit: cover; border-radius: 6px; background: #000; display: block; }
+.mtime { font: 12px var(--mono); color: var(--accent); }
+.mwhat { margin: 1px 0 3px; }
+.msaid { color: var(--muted); font-style: italic; margin: 0 0 5px; }
+.mact { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.mact a, .mact button { font-size: 12px; }
+mark { background: rgba(232, 116, 59, .35); color: inherit; border-radius: 2px; }
+.more { padding: 8px 14px 12px; color: var(--muted); font-size: 12.5px; }
+
+/* videos */
+.statusbar { display: flex; flex-wrap: wrap; gap: 6px; }
+.statusbar button { border: 1px solid var(--line); background: var(--panel-2); border-radius: 99px; padding: 3px 11px; color: var(--muted); font-size: 12.5px; }
+.statusbar button.on { border-color: var(--accent); color: var(--text); background: var(--accent-weak); }
+.shoot h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin: 22px 0 8px; }
+.vrow { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 11px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+.vtop { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.vtitle { font-weight: 600; flex: 1 1 240px; min-width: 0; }
+.vtitle a { color: var(--text); text-decoration: none; } .vtitle a:hover { color: var(--accent); }
+.vmeta { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.vedit { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.vedit input.url { flex: 1 1 220px; } .vedit input.notes { flex: 2 1 260px; }
+.st { font-weight: 600; }
+.st[data-s="in review"] { color: var(--warn); } .st[data-s="ready to post"] { color: var(--accent); }
+.st[data-s="scheduled"] { color: var(--info); } .st[data-s="posted"] { color: var(--done); }
+.st[data-s="shelved"], .st[data-s="superseded"] { color: var(--faint); }
+details.used { margin-top: 6px; } details.used summary { color: var(--muted); font-size: 12.5px; cursor: pointer; }
+details.used ul { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; }
+.saved { color: var(--done); font-size: 12px; }
+#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--panel); border: 0; padding: 8px 14px; border-radius: 8px; box-shadow: 0 4px 14px rgba(30, 25, 15, .18); }
+@media (max-width: 640px) {
+  .moment { grid-template-columns: 96px 1fr; } .mact { grid-column: 2; flex-direction: row; align-items: center; }
+  .mthumb { width: 96px; } .cthumb { width: 72px; height: 72px; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><i></i>Footage Log</div>
+  <nav class="tabs">
+    <button data-tab="footage" class="on">Footage<span class="count" id="nClips"></span></button>
+    <button data-tab="videos">Videos<span class="count" id="nVideos"></span></button>
+  </nav>
+  <span class="spacer"></span>
+  <span class="faint small" id="updated"></span>
+  <a class="ghost" href="/studio">Studio</a>
+  <a class="ghost" href="/">← Video Review</a>
+</header>
+
+<section id="footage">
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search what happens, what's said, tags…  e.g. close-up, tasting, the reveal" autocomplete="off" spellcheck="false">
+    <select id="fShoot"><option value="">All shoots</option></select>
+    <select id="fCam"><option value="">All cameras</option></select>
+    <select id="fPerson"><option value="">Anyone</option></select>
+    <select id="fTag"><option value="">Any tag</option></select>
+    <label class="check"><input type="checkbox" id="fFresh"> Not used yet</label>
+    <label class="check"><input type="checkbox" id="fClean"> No flags</label>
+  </div>
+  <div class="resultline" id="fCount"></div>
+  <main id="clips"></main>
+</section>
+
+<section id="videos" hidden>
+  <div class="controls">
+    <input type="search" id="vq" placeholder="Filter videos" autocomplete="off" spellcheck="false">
+    <div class="statusbar" id="statusbar"></div>
+  </div>
+  <div class="resultline" id="vCount"></div>
+  <main id="vlist"></main>
+</section>
+<div id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const qp = p => 'path=' + encodeURIComponent(p);
+const tc = t => { t = Math.max(0, +t || 0); const m = Math.floor(t / 60), s = t - m * 60; return `${m}:${s < 10 ? '0' : ''}${s.toFixed(1)}`; };
+const mins = t => t >= 60 ? `${Math.floor(t / 60)} min ${Math.round(t % 60)} s` : `${Math.round(t)} s`;
+const STATUSES = ['in review', 'ready to post', 'scheduled', 'posted', 'shelved', 'superseded'];
+const store = { get(k, d) { try { const v = localStorage.getItem('fl.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem('fl.' + k, JSON.stringify(v)); } catch {} } };
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2400); }
+async function api(url, body) {
+  const r = await fetch(url, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Video-Review': '1' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || r.statusText); return j;
+}
+const still = (path, t, w = 264) => `/api/still.jpg?${qp(path)}&t=${(+t || 0).toFixed(2)}&w=${w}`;
+const openAt = (path, t) => `/#/v/${encodeURIComponent(path)}?t=${(+t || 0).toFixed(2)}`;
+
+const D = { clips: [], videos: [], open: new Set(), status: store.get('status', 'active') };
+
+/* ---------- tabs ---------- */
+function tab(name) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  $('#footage').hidden = name !== 'footage'; $('#videos').hidden = name !== 'videos';
+  store.set('tab', name);
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => tab(b.dataset.tab));
+
+/* ---------- footage ---------- */
+function usedFor(c, a, b) {
+  return (c.used_in || []).filter(u => u.status !== 'superseded' && u.from < b && u.to > a);
+}
+function words(q) { return q.toLowerCase().split(/\s+/).filter(Boolean); }
+function hay(...xs) { return xs.flat().filter(Boolean).join(' ').toLowerCase(); }
+function hl(text, ws) {
+  let s = esc(text);
+  for (const w of ws) if (w.length > 1) s = s.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>');
+  return s;
+}
+function fillFilters() {
+  const shoots = [...new Set(D.clips.map(c => c.shoot))].sort();
+  $('#fShoot').innerHTML = '<option value="">All shoots</option>' + shoots.map(s => `<option>${esc(s)}</option>`).join('');
+  const cams = [...new Set(D.clips.map(c => c.camera).filter(Boolean))].sort();
+  $('#fCam').innerHTML = '<option value="">All cameras</option>' + cams.map(s => `<option>${esc(s)}</option>`).join('');
+  const people = new Map(), tags = new Map();
+  for (const c of D.clips) for (const m of c.moments || []) {
+    for (const p of (m.people || c.people || [])) people.set(p, (people.get(p) || 0) + 1);
+    for (const t of (m.tags || [])) tags.set(t, (tags.get(t) || 0) + 1);
+  }
+  $('#fPerson').innerHTML = '<option value="">Anyone</option>' + [...people].sort((a, b) => b[1] - a[1]).map(([p]) => `<option>${esc(p)}</option>`).join('');
+  $('#fTag').innerHTML = '<option value="">Any tag</option>' + [...tags].sort((a, b) => b[1] - a[1]).map(([t, n]) => `<option value="${esc(t)}">${esc(t)} (${n})</option>`).join('');
+  for (const id of ['fShoot', 'fCam', 'fPerson', 'fTag']) { const v = store.get(id, ''); if ([...$('#' + id).options].some(o => o.value === v)) $('#' + id).value = v; }
+  $('#fFresh').checked = store.get('fFresh', false); $('#fClean').checked = store.get('fClean', false);
+  $('#q').value = store.get('q', '');
+}
+function renderClips() {
+  const q = $('#q').value.trim(), ws = words(q);
+  const f = { shoot: $('#fShoot').value, cam: $('#fCam').value, person: $('#fPerson').value, tag: $('#fTag').value,
+              fresh: $('#fFresh').checked, clean: $('#fClean').checked };
+  for (const [k, v] of Object.entries({ q, fShoot: f.shoot, fCam: f.cam, fPerson: f.person, fTag: f.tag, fFresh: f.fresh, fClean: f.clean })) store.set(k, v);
+  const momentFilter = !!(ws.length || f.person || f.tag || f.fresh || f.clean);
+  let nClips = 0, nMoments = 0, html = '';
+  for (const c of D.clips) {
+    if (f.shoot && c.shoot !== f.shoot) continue;
+    if (f.cam && c.camera !== f.cam) continue;
+    const clipText = hay(c.summary, c.clip, c.shoot, c.location, c.tags, c.people, c.speech);
+    const clipHit = ws.length && ws.every(w => clipText.includes(w));
+    const base = hay(c.clip, c.shoot, c.camera, c.location);  // a moment matches on its own words plus where it's from
+    const ms = (c.moments || []).map((m, i) => ({ m, i, used: usedFor(c, m.start, m.end) })).filter(({ m, used }) => {
+      if (f.person && !(m.people || c.people || []).includes(f.person)) return false;
+      if (f.tag && !(m.tags || []).includes(f.tag)) return false;
+      if (f.fresh && used.length) return false;
+      if (f.clean && (m.flags || []).length) return false;
+      if (ws.length) { const h = base + ' ' + hay(m.what, m.said, m.tags, m.use_for, m.people, m.flags); if (!ws.every(w => h.includes(w))) return false; }
+      return true;
+    });
+    const onlyText = !(f.person || f.tag || f.fresh || f.clean);
+    const summaryOnly = momentFilter && !ms.length && clipHit && onlyText;  // the clip as a whole matches, no single moment does
+    if (momentFilter && !ms.length && !summaryOnly) continue;
+    nClips++; nMoments += ms.length;
+    const open = summaryOnly ? D.open.has(c.path) : (momentFilter || D.open.has(c.path));
+    const usedVids = [...new Set((c.used_in || []).filter(u => u.status !== 'superseded').map(u => u.video))];
+    const best = (c.moments || []).find(m => m.best_still != null);
+    const thumbT = best ? best.best_still : (c.duration || 0) / 3;
+    const [first, ...rest] = (c.summary || c.clip).split(/(?<=[.!?])\s+/);
+    html += `<article class="clip" data-path="${esc(c.path)}">
+      <div class="chead" data-toggle="${esc(c.path)}">
+        <img class="cthumb" loading="lazy" src="${still(c.path, thumbT, 240)}" alt="">
+        <div class="cmain">
+          <div class="cname">${hl(first, ws)}</div>
+          <div class="cmeta"><span class="mono">${esc(c.clip)}</span> · ${esc(c.shoot)} · ${esc(c.camera)} · ${esc((c.recorded || '').replace('T', ' ').slice(0, 16))} · ${tc(c.duration)} · ${esc(c.orientation || '')}
+            ${c.quality ? ` · <span class="stars" title="quality ${c.quality}/5">${'★'.repeat(c.quality)}${'☆'.repeat(5 - c.quality)}</span>` : ''}</div>
+          ${rest.length ? `<p class="csum">${hl(rest.join(' '), ws)}</p>` : ''}
+          <div class="chips">
+            ${usedVids.length ? `<span class="chip used" title="${esc(usedVids.join('\n'))}">used ${mins(c.used_seconds || 0)} in ${usedVids.length} video${usedVids.length > 1 ? 's' : ''}</span>` : '<span class="chip fresh">not used yet</span>'}
+            ${(c.people || []).map(p => `<span class="chip person">${esc(p)}</span>`).join('')}
+            ${(c.flags || []).map(x => `<span class="chip flag">${esc(x)}</span>`).join('')}
+            <span class="chip">${(c.moments || []).length} moments</span>
+          </div>
+        </div>
+      </div>
+      ${open ? `<div class="moments">${(summaryOnly ? (c.moments || []).map(m => ({ m, used: usedFor(c, m.start, m.end) })) : ms).map(({ m, used }) => momentRow(c, m, used, ws)).join('')}
+        ${momentFilter && ms.length < (c.moments || []).length ? `<div class="more">${(c.moments || []).length - ms.length} more moments in this clip don't match.</div>` : ''}</div>` : ''}
+    </article>`;
+  }
+  $('#clips').innerHTML = html || `<p class="empty">${D.clips.length ? 'Nothing matches. Try fewer words or clear a filter.' : 'No clips logged yet. Ask Claude to "log new footage".'}</p>`;
+  $('#fCount').textContent = momentFilter ? `${nMoments} moments in ${nClips} clips` : `${nClips} clips · click a clip to see its moments`;
+}
+function momentRow(c, m, used, ws) {
+  const t = m.best_still != null ? m.best_still : (m.start + m.end) / 2;
+  const ref = `${c.clip} ${tc(m.start)}–${tc(m.end)} (${c.shoot})`;
+  return `<div class="moment${ws.length ? ' hit' : ''}">
+    <a href="${openAt(c.path, m.start)}" title="Open at ${tc(m.start)}"><img class="mthumb" loading="lazy" src="${still(c.path, t)}" alt=""></a>
+    <div>
+      <div class="mtime">${tc(m.start)} – ${tc(m.end)} <span class="faint">(${Math.round(m.end - m.start)} s)</span></div>
+      <div class="mwhat">${hl(m.what, ws)}</div>
+      ${m.said ? `<p class="msaid">“${hl(m.said, ws)}”</p>` : ''}
+      <div class="chips">
+        ${used.length ? `<span class="chip used" title="${esc(used.map(u => `${u.video} (${tc(u.from)}–${tc(u.to)})`).join('\n'))}">used in ${esc([...new Set(used.map(u => u.video))].join(', '))}</span>` : ''}
+        ${(m.use_for || []).map(x => `<span class="chip use">${esc(x)}</span>`).join('')}
+        ${(m.tags || []).map(x => `<span class="chip">${hl(x, ws)}</span>`).join('')}
+        ${(m.flags || []).map(x => `<span class="chip flag">${esc(x)}</span>`).join('')}
+      </div>
+    </div>
+    <div class="mact">
+      <a class="ghost" href="${openAt(c.path, m.start)}">Open</a>
+      <button class="ghost" data-copy="${esc(ref)}" title="Copy a reference to paste to Claude">Copy ref</button>
+    </div>
+  </div>`;
+}
+$('#clips').addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]');
+  if (cp) { navigator.clipboard.writeText(cp.dataset.copy).then(() => toast('Copied: ' + cp.dataset.copy), () => toast(cp.dataset.copy)); return; }
+  const h = e.target.closest('[data-toggle]');
+  if (h && !e.target.closest('a')) { const p = h.dataset.toggle; D.open.has(p) ? D.open.delete(p) : D.open.add(p); renderClips(); }
+});
+let qT; $('#q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(renderClips, 150); });
+['fShoot', 'fCam', 'fPerson', 'fTag', 'fFresh', 'fClean'].forEach(id => $('#' + id).addEventListener('change', renderClips));
+
+/* ---------- videos ---------- */
+function renderStatusbar() {
+  const n = s => D.videos.filter(v => s === 'all' ? true : s === 'active' ? !['superseded', 'shelved'].includes(v.status) : v.status === s).length;
+  const opts = [['active', 'Current'], ['all', 'All'], ...STATUSES.map(s => [s, s[0].toUpperCase() + s.slice(1)])];
+  $('#statusbar').innerHTML = opts.map(([k, l]) => `<button data-s="${k}" class="${D.status === k ? 'on' : ''}">${l} <span class="faint">${n(k)}</span></button>`).join('');
+}
+$('#statusbar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; D.status = b.dataset.s; store.set('status', D.status); renderVideos(); });
+function renderVideos() {
+  renderStatusbar();
+  const ws = words($('#vq').value);
+  const vids = D.videos.filter(v => (D.status === 'all' || (D.status === 'active' ? !['superseded', 'shelved'].includes(v.status) : v.status === D.status))
+    && (!ws.length || ws.every(w => hay(v.title, v.file, v.shoot, v.notes, v.platform, v.brand, v.status, v.kind).includes(w))));
+  const shoots = [...new Set(vids.map(v => v.shoot))].sort().reverse();
+  $('#vlist').innerHTML = shoots.map(s => `<section class="shoot"><h2>${esc(s)}</h2>${vids.filter(v => v.shoot === s).map(vrow).join('')}</section>`).join('')
+    || '<p class="empty">No videos match.</p>';
+  $('#vCount').textContent = `${vids.length} of ${D.videos.length} videos`;
+}
+function vrow(v) {
+  const clips = v.clips_used || [];
+  const byClip = {}; for (const c of clips) (byClip[c.clip] = byClip[c.clip] || []).push(c);
+  const pathOf = name => (D.clips.find(c => c.clip === name) || {}).path;
+  return `<div class="vrow" data-file="${esc(v.file)}">
+    <div class="vtop">
+      <div class="vtitle"><a href="/#/v/${encodeURIComponent(v.file)}" title="Open in Video Review">${esc(v.title)}</a></div>
+      <select class="status st" data-s="${esc(v.status)}" data-k="status">${STATUSES.map(s => `<option ${s === v.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+    </div>
+    <div class="vmeta">${esc(v.kind)} · ${esc(v.brand)} · ${esc(v.platform)} · ${tc(v.length)}${v.style ? ' · ' + esc(v.style) : ''} · <span class="mono">${esc(v.file.split('/').slice(1).join(' / '))}</span>
+      ${v.caption_file ? ` · caption: ${esc(v.caption_file)}` : ''}${(v.cover_files || []).length ? ` · cover: ${esc(v.cover_files.join(', '))}` : ''}</div>
+    <div class="vedit">
+      <label class="small muted">Posted <input type="date" data-k="posted_on" value="${esc(v.posted_on)}"></label>
+      <input class="url" data-k="post_url" placeholder="Post link" value="${esc(v.post_url)}">
+      <input class="notes" data-k="notes" placeholder="Notes" value="${esc(v.notes)}">
+      <span class="saved" hidden>Saved</span>
+    </div>
+    ${clips.length ? `<details class="used"><summary>Used ${Object.keys(byClip).length} raw clips · ${mins(clips.reduce((s, c) => s + c.to - c.from, 0))}${clips.some(c => c.approx) ? ' (some approximate)' : ''}${v.built_by ? ' · built by ' + esc(v.built_by) : ''}</summary><ul>
+      ${Object.entries(byClip).map(([name, rs]) => { const p = pathOf(name); return `<li><span class="mono">${esc(name)}</span>: ${rs.map(r => p ? `<a href="${openAt(p, r.from)}">${tc(r.from)}–${tc(r.to)}</a>` : `${tc(r.from)}–${tc(r.to)}`).join(', ')}</li>`; }).join('')}
+    </ul></details>` : `<div class="vmeta">Clips used: not recorded${v.notes ? '' : ''}</div>`}
+  </div>`;
+}
+$('#vlist').addEventListener('change', async e => {
+  const el = e.target.closest('[data-k]'); if (!el) return;
+  const row = el.closest('.vrow'), file = row.dataset.file;
+  try {
+    const v = await api('/api/tracker', { file, [el.dataset.k]: el.value });
+    Object.assign(D.videos.find(x => x.file === file), v);
+    if (el.dataset.k === 'status') { el.dataset.s = el.value; row.querySelector('[data-k=posted_on]').value = v.posted_on || ''; renderStatusbar(); }
+    const s = row.querySelector('.saved'); s.hidden = false; setTimeout(() => s.hidden = true, 1500);
+  } catch (err) { toast("Couldn't save: " + err.message); }
+});
+$('#vq').addEventListener('input', renderVideos);
+
+/* ---------- load ---------- */
+(async function load() {
+  try {
+    const [f, t] = await Promise.all([api('/api/footage'), api('/api/tracker')]);
+    D.clips = (f.clips || []).sort((a, b) => (b.shoot || '').localeCompare(a.shoot || '') || (a.recorded || '').localeCompare(b.recorded || ''));
+    D.videos = t.videos || [];
+    $('#nClips').textContent = D.clips.length; $('#nVideos').textContent = D.videos.length;
+    $('#updated').textContent = f.updated ? 'Log updated ' + f.updated.replace('T', ' ').slice(0, 16) : '';
+    fillFilters(); renderClips(); renderVideos();
+    tab(store.get('tab', 'footage'));
+  } catch (e) { $('#clips').innerHTML = `<p class="empty">Couldn't load the footage log: ${esc(e.message)}</p>`; }
+})();
+</script>
+</body>
+</html>

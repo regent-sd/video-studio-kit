@@ -1,0 +1,43 @@
+{
+  "_about": "What the reel says and shows. Times are in seconds. Set each beat's 'at' to when its line starts in the voiceover (transcribe the take to find them). Files are inside public/.",
+  "voiceover": "",
+  "music": "",
+  "beats": [
+    {
+      "at": 0,
+      "before": "Your plants, ",
+      "hl": "watered",
+      "after": " on time.",
+      "sub": "Mossy shows which ones need water today.",
+      "clip": "",
+      "clipFrom": 0,
+      "device": "phone"
+    },
+    {
+      "at": 4,
+      "before": "Add a plant in ",
+      "hl": "seconds.",
+      "after": "",
+      "sub": "Name, room, how often. That's it.",
+      "clip": "",
+      "clipFrom": 0,
+      "device": "phone"
+    },
+    {
+      "at": 8,
+      "before": "One tap when ",
+      "hl": "it's done.",
+      "after": "",
+      "sub": "The countdown starts again by itself.",
+      "clip": "",
+      "clipFrom": 0,
+      "device": "phone"
+    }
+  ],
+  "cta": {
+    "at": 12,
+    "line": "Every plant in one place.",
+    "button": "Try it free"
+  },
+  "end": 15
+}

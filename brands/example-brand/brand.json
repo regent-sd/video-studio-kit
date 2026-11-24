@@ -1,0 +1,68 @@
+{
+  "name": "Example Brand",
+  "slug": "example-brand",
+  "about": "A made-up brand so every tool works before you add your own. Copy this folder to brands/<your-brand>/ and change it, or say \"set up my brand\" to Claude.",
+
+  "colors": {
+    "background": "#F6F1E9",
+    "surface": "#FFFFFF",
+    "text": "#2B2118",
+    "muted": "#8C7B6B",
+    "accent": "#C8642D",
+    "highlight": "#EBD9B4",
+    "good": "#2E9E5B",
+    "bad": "#D64541",
+    "dark": "#1C1916",
+    "dark_surface": "#2A2622",
+    "on_dark": "#F6F1E9"
+  },
+  "_colors": "background: plain backgrounds. surface: cards. text: words on light. accent: tags and highlights. highlight: the box behind a keyword. good/bad: check marks and warnings. dark/dark_surface/on_dark: dark panels and the words on them.",
+
+  "fonts": {
+    "title": "New York",
+    "heading": "Avenir Next Demi Bold",
+    "caption": "Avenir Next Demi Bold",
+    "number": "New York",
+    "body": "Avenir Next Medium"
+  },
+  "_fonts": "Each is a Mac system font name (lib/studio_config.py, SYSTEM_FONTS) or a file in this folder's fonts/ (\"fonts/MyBrand-Bold.otf\"). Fonts you bought stay out of git (brands/*/fonts/ is ignored).",
+
+  "logo": "",
+  "_logo": "A PNG with a transparent background in this folder, e.g. \"logo.png\". Used on end cards.",
+
+  "handle": "@examplebrand",
+  "end_card_line": "Follow for more",
+
+  "captions": {
+    "on_footage": "block",
+    "on_background": "plain",
+    "keyword_style": "highlight"
+  },
+  "_captions": "on_footage: \"block\" (words in a colour block) or \"outline\". keyword_style: \"highlight\" (box behind) or \"color\" (accent-coloured word).",
+
+  "grade": "warm",
+  "_grade": "warm, neutral or cool. Used by Hands-On Classic.",
+
+  "never_use_as_background": [],
+  "_never_use_as_background": "Colour roles that must never fill a background, e.g. [\"accent\"].",
+
+  "keep_out": [],
+  "_keep_out": "Things that must never be on screen: other brands' logos, screens with private details, a sign that's out of date. Claude checks every cut against this list.",
+
+  "people": {
+    "permission_needed": true,
+    "keep_children_out": true,
+    "notes": ""
+  },
+
+  "effects": {
+    "restrained": false,
+    "favorites": []
+  },
+  "_effects": "restrained: true = only quiet effects (paper-tear, typewriter, rack-focus...). favorites: effect names to reach for first.",
+
+  "music": {
+    "under_voice_db": -20,
+    "notes": ""
+  }
+}

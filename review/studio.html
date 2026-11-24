@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Studio</title>
+<style>
+:root {
+  /* Light theme, the same colours as Video Review and the Footage Log. */
+  --bg: #f5f3ef; --panel: #ffffff; --panel-2: #f1eee9; --panel-3: #e9e5de; --panel-hover: #fbf9f5;
+  --line: #e0dcd4; --line-soft: #ebe8e1; --line-strong: #c4bfb5;
+  --text: #1d1e21; --muted: #5d6068; --faint: #72757e;
+  --accent: #b84a16; --accent-bright: #e8743b; --accent-ink: #ffffff;
+  --accent-weak: rgba(232, 116, 59, .13); --accent-line: rgba(184, 74, 22, .45);
+  --done: #23774a; --done-weak: rgba(35, 119, 74, .12);
+  --warn: #8a5a00; --warn-weak: rgba(224, 179, 65, .22);
+  --info: #2a62b8; --info-weak: rgba(42, 98, 184, .10);
+  --err: #b3261e; --code-bg: #f3f1ec;
+  --shadow: 0 1px 2px rgba(30, 25, 15, .05);
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--accent); }
+code { font: 12.5px var(--mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .small { font-size: 12.5px; }
+.spacer { flex: 1; }
+
+.topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+  border-bottom: 1px solid var(--line); background: var(--panel); min-height: 52px; flex-wrap: wrap; }
+.brand { font-weight: 650; display: flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; }
+.brand i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-bright); display: inline-block; }
+.tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+.tabs a { border-bottom: 2px solid transparent; padding: 6px 10px; color: var(--muted); font-weight: 600; text-decoration: none; }
+.tabs a:hover { color: var(--text); }
+.tabs a.on { color: var(--text); border-bottom-color: var(--accent-bright); }
+.tabs .count { color: var(--accent); margin-left: 4px; }
+.ghost { border: 1px solid var(--line); background: var(--panel-2); border-radius: 7px; padding: 5px 11px; text-decoration: none; color: var(--text); }
+.ghost:hover { border-color: var(--line-strong); background: var(--panel-3); }
+.primary { background: var(--accent); border: 1px solid var(--accent); color: var(--accent-ink); font-weight: 650; border-radius: 8px; padding: 8px 16px; text-decoration: none; display: inline-block; }
+.primary:hover { filter: brightness(1.1); }
+.primary:disabled { opacity: .6; cursor: default; }
+
+main { max-width: 1120px; margin: 0 auto; padding: 22px 16px 80px; }
+h1 { font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
+h2.sec { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin: 34px 0 10px; }
+.intro { color: var(--muted); margin: 0 0 18px; max-width: 760px; }
+.head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+.empty { color: var(--muted); padding: 14px 0; margin: 0; }
+
+/* home */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile { display: flex; flex-direction: column; gap: 6px; min-height: 108px; padding: 18px 18px 16px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--line); color: var(--text); text-decoration: none; transition: border-color .12s, background .12s; box-shadow: var(--shadow); }
+.tile:hover { border-color: var(--accent); background: var(--panel-hover); }
+.tile b { font-size: 17px; font-weight: 650; }
+.tile span { color: var(--muted); }
+.tile.main { background: var(--accent-weak); border-color: var(--accent-line); }
+.tile.main b { color: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; text-decoration: none; color: var(--text); box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 26px; font-weight: 650; line-height: 1.1; }
+.stat span { color: var(--muted); font-size: 12.5px; }
+.stat.hot b { color: var(--accent); }
+.needs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 12px; margin-top: 12px; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; box-shadow: var(--shadow); }
+.box h3 { margin: 0 0 4px; font-size: 14px; }
+.box .why { color: var(--faint); font-size: 12.5px; margin: 0 0 8px; }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { border-top: 1px solid var(--line-soft); padding: 8px 0; display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.rows li:first-child { border-top: 0; }
+.rows .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.rows .t .s { display: block; color: var(--faint); font-size: 12px; }
+.rows .t a { color: var(--text); text-decoration: none; } .rows .t a:hover { color: var(--accent); }
+.rows .m { color: var(--faint); font-size: 12px; flex: none; }
+.more { background: none; border: 0; color: var(--accent); padding: 6px 0 0; font-size: 12.5px; }
+.badge { font-size: 11px; padding: 1px 8px; border-radius: 99px; font-weight: 600; white-space: nowrap; }
+.badge.open, .badge.review { background: var(--warn-weak); color: var(--warn); }
+.badge.notes { background: var(--accent-weak); color: var(--accent); }
+.badge.ok { background: var(--done-weak); color: var(--done); }
+.badge.new { background: var(--info-weak); color: var(--info); }
+.badge.plain { background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); }
+details.loop { margin-top: 26px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 16px; }
+details.loop summary { cursor: pointer; padding: 14px 0; font-weight: 600; }
+details.loop .doc { padding-bottom: 12px; }
+
+/* cards list */
+.cardrow { display: flex; gap: 12px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px; text-decoration: none; color: var(--text); }
+.cardrow:hover { border-color: var(--line-strong); background: var(--panel-hover); }
+.cardrow .t { flex: 1; min-width: 0; }
+.cardrow .t b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cardrow .t span { color: var(--muted); font-size: 12.5px; }
+
+/* card form */
+form.card { max-width: 860px; }
+.formhead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 52px; z-index: 4;
+  background: var(--bg); padding: 10px 0; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+.formhead h1 { margin: 0; flex: 1; min-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.state { color: var(--muted); font-size: 12.5px; }
+.state.dirty { color: var(--warn); } .state.ok { color: var(--done); }
+.field { display: block; margin: 0 0 18px; }
+.field > span, .field > .lab { display: block; font-weight: 650; margin-bottom: 3px; }
+.field small, .hint { display: block; color: var(--muted); font-size: 12.5px; margin: 0 0 7px; }
+.field input:not([type=checkbox]), .field textarea, .field select { width: 100%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 9px 11px; outline: none; }
+.field textarea { min-height: 84px; resize: vertical; line-height: 1.45; }
+.field textarea.tall { min-height: 140px; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+.field input.big { font-size: 18px; font-weight: 600; padding: 11px 13px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 13px; color: var(--text); text-align: left; }
+.seg button:hover { border-color: var(--line-strong); }
+.seg button.on { border-color: var(--accent); background: var(--accent-weak); }
+.seg.col { flex-direction: column; }
+.seg.col button { display: flex; flex-direction: column; gap: 2px; padding: 10px 13px; }
+.seg.col button b { font-weight: 650; }
+.seg.col button span { color: var(--muted); font-size: 12.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.chip { font-size: 12.5px; border-radius: 99px; padding: 4px 11px; background: var(--panel-2); border: 1px solid var(--line); color: var(--muted); }
+button.chip:hover { border-color: var(--line-strong); color: var(--text); }
+.chip.on { border-color: var(--accent); background: var(--accent-weak); color: var(--text); }
+.sub { color: var(--faint); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 8px 0 6px; }
+.tell { margin: 4px 0 20px; padding: 12px 14px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.err { color: var(--err); }
+
+/* glossary + classroom + ideas */
+.gitem.found { outline: 2px solid var(--accent-bright, #e8743b); outline-offset: 2px; transition: outline-color .4s; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.controls input[type=search] { flex: 1 1 260px; max-width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; outline: none; }
+.controls input[type=search]:focus { border-color: var(--accent); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button { border: 1px solid var(--line); background: var(--panel-2); border-radius: 99px; padding: 3px 11px; color: var(--muted); font-size: 12.5px; }
+.filters button.on { border-color: var(--accent); color: var(--text); background: var(--accent-weak); }
+.resultline { color: var(--muted); font-size: 12.5px; margin: 0 0 10px; }
+.gitem { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.gtop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.gname { font-size: 15px; font-weight: 650; }
+.kind { color: var(--faint); font-size: 12px; }
+.cmd { font: 12px var(--mono); border: 1px solid var(--line); background: var(--code-bg); color: var(--accent); border-radius: 6px; padding: 2px 7px; }
+.cmd:hover { border-color: var(--accent); }
+.gitem p { margin: 5px 0 4px; }
+.gmeta { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.gmeta b { color: var(--faint); font-weight: 600; }
+.strip { display: block; width: 100%; max-width: 620px; margin-top: 8px; border-radius: 6px; background: #000; }
+.pv video { display: block; width: 180px; margin-top: 8px; border-radius: 8px; background: #000; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; font-size: 12.5px; }
+.lesson { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+.lesson .ltop { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.lesson h3 { margin: 0; font-size: 16px; }
+.lsecs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4px 22px; margin-top: 6px; }
+.lsec h4 { margin: 10px 0 2px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+.lsec .doc p, .lsec .doc ul { margin: 2px 0 6px; }
+
+/* guides */
+.guides { display: grid; grid-template-columns: 270px 1fr; gap: 18px; align-items: start; }
+.glist { position: sticky; top: 64px; display: flex; flex-direction: column; gap: 6px; }
+.glist a { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; color: var(--text); text-decoration: none; }
+.glist a:hover { border-color: var(--line-strong); }
+.glist a.on { border-color: var(--accent); background: var(--accent-weak); }
+.glist a span { display: block; color: var(--muted); font-size: 12px; }
+.glist .grp { color: var(--faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; margin: 10px 0 2px; }
+.gdoc { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 22px 20px; min-width: 0; }
+
+/* rendered markdown */
+.doc { line-height: 1.55; overflow-wrap: anywhere; }
+.doc h1 { font-size: 22px; margin: 16px 0 8px; } .doc h2 { font-size: 17px; margin: 22px 0 6px; } .doc h3 { font-size: 15px; margin: 18px 0 4px; }
+.doc h4 { font-size: 14px; margin: 14px 0 4px; }
+.doc p { margin: 6px 0 10px; } .doc ul, .doc ol { margin: 4px 0 10px; padding-left: 22px; } .doc li { margin: 3px 0; }
+.doc ol { list-style: none; padding-left: 4px; } .doc ol .mk { color: var(--faint); font-family: var(--mono); font-size: 12px; margin-right: 2px; }
+.doc .fm { color: var(--muted); }
+.doc pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+.doc pre code { border: 0; padding: 0; background: none; }
+.doc blockquote { border-left: 2px solid var(--line); margin: 8px 0; padding: 0 12px; color: var(--muted); }
+.doc hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.tablewrap { overflow-x: auto; margin: 6px 0 12px; }
+.doc table { border-collapse: collapse; font-size: 13px; min-width: 60%; }
+.doc th, .doc td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+.doc th { background: var(--panel-2); }
+.say .doc code { cursor: copy; }
+.say .doc code:hover { border-color: var(--accent); color: var(--accent); }
+
+#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--panel); border: 0; padding: 8px 14px; border-radius: 8px; z-index: 9; max-width: 90vw; box-shadow: 0 4px 14px rgba(30, 25, 15, .18); }
+@media (max-width: 760px) {
+  .row2, .guides { grid-template-columns: 1fr; }
+  .glist { position: static; }
+  .formhead { top: 0; position: static; }
+  .topbar { position: static; gap: 8px; }
+  .tabs a { padding: 6px 7px; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/studio"><i></i>Video Studio</a>
+  <nav class="tabs" id="tabs">
+    <a data-tab="home" href="/studio">Home</a>
+    <a data-tab="edits" href="/studio/edits">Edits<span class="count" id="nCards"></span></a>
+    <a data-tab="glossary" href="/studio/glossary">Glossary</a>
+    <a data-tab="classroom" href="/studio/classroom">Classroom</a>
+    <a data-tab="ideas" href="/studio/ideas">Ideas</a>
+    <a data-tab="guides" href="/studio/guides">Guides</a>
+    <a data-tab="say" href="/studio/say">What to say</a>
+  </nav>
+  <span class="spacer"></span>
+  <a class="ghost" href="/">Video Review</a>
+  <a class="ghost" href="/library" data-fl-tab="footage">Footage log</a>
+</header>
+
+<main>
+<!-- ============ home ============ -->
+<section id="v-home" hidden>
+  <h1 id="hHello">What do you want to do?</h1>
+  <p class="intro" id="hSetup" hidden>There are no house rules yet. Tell Claude <code>set up my studio</code> (START-HERE.md walks through it).</p>
+  <div class="tiles">
+    <a class="tile main" href="/studio/new"><b>Start a new edit</b><span>Fill in a card: what the video is for, the footage, the style.</span></a>
+    <a class="tile" href="/"><b>Review a video</b><span>Watch a cut and leave notes at the exact moment.</span></a>
+    <a class="tile" href="/library" data-fl-tab="footage"><b>Footage</b><span>Find a clip or a moment in the raw footage.</span></a>
+    <a class="tile" href="/library" data-fl-tab="videos"><b>Videos</b><span>What's posted, ready to post or in review.</span></a>
+    <a class="tile" href="/assets" id="hAssets" hidden><b>Assets</b><span>Every photo, logo, menu and design file in your asset folders.</span></a>
+    <a class="tile" href="/studio/glossary"><b>Glossary</b><span>Every effect, style and studio word, with previews.</span></a>
+    <a class="tile" href="/studio/classroom"><b>Classroom</b><span>Reels saved for how they're edited: a look, a cut, an effect.</span></a>
+    <a class="tile" href="/studio/ideas"><b>Ideas</b><span>Reels saved for what they say: what to make, and how to plan and shoot it.</span></a>
+    <a class="tile" href="/studio/guides"><b>Guides</b><span>How you like a story told, and how the tools work.</span></a>
+    <a class="tile" href="/studio/say"><b>What to say to Claude</b><span>The phrases that work, ready to copy.</span></a>
+  </div>
+
+  <h2 class="sec">Needs you</h2>
+  <div class="stats" id="hStats"></div>
+  <div class="needs">
+    <div class="box"><h3>Edits in progress</h3><p class="why">Cards that aren't approved yet.</p><ul class="rows" id="hCards"></ul></div>
+    <div class="box"><h3>Open notes</h3><p class="why">Notes you left that Claude hasn't done. Tell Claude: <code>apply my notes on &lt;video&gt;</code></p><ul class="rows" id="hNotes"></ul></div>
+    <div class="box"><h3>In review</h3><p class="why">Videos waiting for you to watch them.</p><ul class="rows" id="hReview"></ul></div>
+    <div class="box"><h3>Ready to post</h3><p class="why">Approved and not posted yet. Tell Claude: <code>mark &lt;video&gt; posted</code></p><ul class="rows" id="hReady"></ul></div>
+  </div>
+  <details class="loop" id="hLoop"><summary>When you approve a video: what Claude does next</summary><div class="doc" id="hLoopDoc"></div></details>
+</section>
+
+<!-- ============ edits (project cards) ============ -->
+<section id="v-edits" hidden>
+  <div class="head"><h1>Edits</h1><span class="spacer"></span><a class="primary" href="/studio/new">Start a new edit</a></div>
+  <p class="intro">Every edit starts as a card. When it's filled in, tell Claude <code>start the card &lt;name&gt;</code>. Claude reads the card, your storytelling guide, the style and the glossary, then shows you a plan before it builds anything.</p>
+  <div id="eList"></div>
+</section>
+
+<!-- ============ one card ============ -->
+<section id="v-card" hidden>
+  <form class="card" id="cardForm" autocomplete="off">
+    <div class="formhead">
+      <h1 id="cHead">New edit</h1>
+      <span class="state" id="cState"></span>
+      <button class="primary" type="submit">Save card</button>
+    </div>
+    <p class="err" id="cErr" hidden></p>
+
+    <label class="field"><span>Title</span>
+      <input class="big" name="title" maxlength="120" placeholder="e.g. Kitchen remodel: the reveal" required></label>
+
+    <div class="field"><span class="lab">Brand</span>
+      <div class="seg" data-one="brand" id="segBrand"></div>
+      <input name="brand_other" maxlength="80" placeholder="Which brand?" hidden style="margin-top:8px"></div>
+
+    <div class="field"><span class="lab">Style</span>
+      <small>There's no default style. Pick one, or "Ask me" and Claude will ask before editing.</small>
+      <div class="seg col" data-one="style" id="segStyle"></div></div>
+
+    <div class="field"><span class="lab">Footage</span>
+      <small>Pick the shoot folders, and paste clip refs from the Footage tab (its <b>Copy ref</b> button), one per line.</small>
+      <div class="chips" data-many="shoots" id="chShoots"></div>
+      <textarea name="clips" maxlength="6000" placeholder="C0041.MP4 0:09.7–0:13.9 (2026-03-14 Kitchen Remodel)"></textarea>
+      <a class="small" href="/library" data-fl-tab="footage" target="_blank" rel="noopener">Open the Footage tab in a new window</a></div>
+
+    <label class="field"><span>Vision</span><small>What is this video for, and how should it feel?</small>
+      <textarea name="vision" maxlength="6000" class="tall"></textarea></label>
+
+    <label class="field"><span>Script or talking points</span><small>What gets said, in order. Rough is fine.</small>
+      <textarea name="script" maxlength="12000" class="tall"></textarea></label>
+
+    <div class="row2">
+      <label class="field"><span>Length</span><input name="length" maxlength="60" placeholder="e.g. 30–45 s"></label>
+      <label class="field"><span>Platform</span><select name="platform" id="selPlatform"></select></label>
+    </div>
+
+    <div class="row2">
+      <label class="field"><span>Must keep</span><small>Lines, shots or facts that have to stay in.</small><textarea name="must_keep" maxlength="4000"></textarea></label>
+      <label class="field"><span>Must avoid</span><small>People, logos, screens or lines to keep out.</small><textarea name="must_avoid" maxlength="4000"></textarea></label>
+    </div>
+
+    <div class="field"><span class="lab">References</span>
+      <small>Classroom reels and effects you'd like. Claude still proposes each effect with its moment, and you decide.</small>
+      <div class="sub">Classroom</div><div class="chips" data-many="classroom" id="chClass"></div>
+      <div class="sub">Effects</div>
+      <div class="controls" style="margin-bottom:6px"><input type="search" id="fxFilter" placeholder="Filter effects"></div>
+      <div class="chips" data-many="effects" id="chFx"></div>
+      <textarea name="references" maxlength="4000" placeholder="Anything else: a link, one of your videos, a look you liked"></textarea></div>
+
+    <div class="field"><span class="lab">Status</span><div class="seg" data-one="status" id="segStatus"></div></div>
+
+    <div class="tell" id="cTell" hidden><span>When it's ready, tell Claude:</span><code id="cTellText"></code><button type="button" class="ghost" id="cCopy">Copy</button></div>
+    <div><button class="primary" type="submit">Save card</button> <span class="state" id="cState2"></span></div>
+  </form>
+</section>
+
+<!-- ============ glossary ============ -->
+<section id="v-glossary" hidden>
+  <div class="head"><h1>Glossary</h1><span class="muted" id="gCount"></span></div>
+  <p class="intro">Every named thing in the studio, in one place. It's built from the files that define each one, so it's always current. Say a name to Claude and it means exactly this.</p>
+  <div class="controls">
+    <input type="search" id="gq" placeholder="Search: spotlight, newspaper, hook, skin, beat…" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="controls"><div class="filters" id="gGroups"></div></div>
+  <div class="controls"><div class="filters" id="gStatus"></div></div>
+  <div class="resultline" id="gLine"></div>
+  <div id="gList"></div>
+</section>
+
+<!-- ============ classroom ============ -->
+<section id="v-classroom" hidden>
+  <div class="head"><h1>Classroom</h1><span class="muted" id="kCount"></span></div>
+  <p class="intro">Reels saved for how they're edited: a look, a cut, an effect, a sound. Claude reads the ones a project card names before planning an edit. Reels saved for what they say are in <a href="/studio/ideas">Ideas</a>. To add one here, tell Claude <code>add this to the classroom: &lt;link&gt;</code></p>
+  <div class="controls"><input type="search" id="kq" placeholder="Search the classroom" autocomplete="off" spellcheck="false"></div>
+  <div class="controls"><div class="filters" id="kTags"></div></div>
+  <div id="kList"></div>
+</section>
+
+<!-- ============ ideas ============ -->
+<section id="v-ideas" hidden>
+  <div class="head"><h1>Ideas</h1><span class="muted" id="iCount"></span></div>
+  <p class="intro">Reels saved for what they say, not how they're cut: what to make, how to plan it, how to shoot it, how to work. They aren't editing references, so Claude doesn't use them when planning an edit. To add one, tell Claude <code>add this to ideas: &lt;link&gt;</code></p>
+  <div class="controls"><input type="search" id="iq" placeholder="Search the ideas" autocomplete="off" spellcheck="false"></div>
+  <div class="controls"><div class="filters" id="iTags"></div></div>
+  <div id="iList"></div>
+</section>
+
+<!-- ============ guides ============ -->
+<section id="v-guides" hidden>
+  <div class="guides">
+    <nav class="glist" id="dList"></nav>
+    <article class="gdoc"><div class="doc" id="dDoc"></div><p class="faint small" id="dPath"></p></article>
+  </div>
+</section>
+
+<!-- ============ what to say ============ -->
+<section id="v-say" class="say" hidden>
+  <div class="head"><h1>What to say to Claude</h1></div>
+  <p class="intro">Click any phrase to copy it.</p>
+  <div class="gdoc"><div class="doc" id="sDoc"></div></div>
+  <h2 class="sec">Effect commands</h2>
+  <p class="intro">Each effect has its own command. Type it with a video and a word or time, for example <code>/spotlight &lt;video&gt; at "&lt;word&gt;"</code>. The Glossary shows what each one looks like.</p>
+  <div class="chips" id="sCmds"></div>
+</section>
+</main>
+<div id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const enc = encodeURIComponent;
+let toastT = 0;
+function toast(m) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+async function api(url, body) {
+  const opts = body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Video-Review': '1' }, body: JSON.stringify(body) };
+  const r = await fetch(url, opts);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.error || r.statusText); e.status = r.status; e.data = j; throw e; }
+  return j;
+}
+function copy(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copied: ' + text), () => toast(text));
+}
+function ago(iso) {
+  if (!iso) return '';
+  const d = new Date(iso); if (isNaN(d)) return iso;
+  const s = (Date.now() - d.getTime()) / 1000;
+  if (s < 3600) return Math.max(1, Math.round(s / 60)) + ' min ago';
+  if (s < 86400) return Math.round(s / 3600) + ' h ago';
+  if (s < 86400 * 14) return Math.round(s / 86400) + ' d ago';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+const videoLink = path => '/#/v/' + enc(path);
+const STATUS_BADGE = { 'new': 'new', 'in progress': 'open', 'in review': 'review', 'approved': 'ok' };
+const store = { get(k, d) { try { const v = localStorage.getItem('studio.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem('studio.' + k, JSON.stringify(v)); } catch {} } };
+
+/* ---------- routing ---------- */
+const D = { home: null, options: null, glossary: null, classroom: null, ideas: null, guides: null, dirty: false, card: null };
+function where() {
+  const seg = location.pathname.replace(/\/+$/, '').split('/').slice(2).map(s => { try { return decodeURIComponent(s); } catch { return s; } });
+  return { tab: seg[0] || 'home', arg: seg.slice(1).join('/') };
+}
+function go(url) {
+  if (D.dirty && !confirm('This card has changes that aren\'t saved. Leave without saving?')) return;
+  D.dirty = false;
+  history.pushState(null, '', url);
+  render();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('popstate', () => { D.dirty = false; render(); });
+document.addEventListener('click', e => {
+  const fl = e.target.closest('[data-fl-tab]');
+  if (fl) { try { localStorage.setItem('fl.tab', JSON.stringify(fl.dataset.flTab)); } catch {} return; }
+  const a = e.target.closest('a[href^="/studio"]');
+  if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  const href = a.getAttribute('href');
+  if (href.includes('#') && href.split('#')[0] === location.pathname) { scrollToId(href.split('#')[1]); return; }
+  go(href);
+});
+window.addEventListener('beforeunload', e => { if (D.dirty) { e.preventDefault(); e.returnValue = ''; } });
+function scrollToId(id) { const el = id && document.getElementById(id); if (el) el.scrollIntoView({ block: 'start' }); }
+
+const VIEWS = { home: 'v-home', edits: 'v-edits', new: 'v-card', card: 'v-card', glossary: 'v-glossary', classroom: 'v-classroom', ideas: 'v-ideas', guides: 'v-guides', say: 'v-say' };
+const TITLES = { home: 'Video Studio', edits: 'Edits', new: 'New edit', card: 'Edit card', glossary: 'Glossary', classroom: 'Classroom', ideas: 'Ideas', guides: 'Guides', say: 'What to say' };
+function render() {
+  let { tab, arg } = where();
+  if (!VIEWS[tab]) tab = 'home';
+  for (const id of new Set(Object.values(VIEWS))) $('#' + id).hidden = id !== VIEWS[tab];
+  const navTab = (tab === 'new' || tab === 'card') ? 'edits' : tab;
+  $$('#tabs a').forEach(a => a.classList.toggle('on', a.dataset.tab === navTab));
+  document.title = TITLES[tab] + (tab === 'home' ? '' : ' · Video Studio');
+  ({ home: showHome, edits: showEdits, new: () => showCard(''), card: () => showCard(arg), glossary: showGlossary,
+     classroom: showClassroom, ideas: showIdeas, guides: () => showGuides(arg), say: showSay })[tab]();
+}
+
+/* ---------- home ---------- */
+function rowsHTML(items, n, fn, emptyText) {
+  if (!items.length) return `<li class="faint">${esc(emptyText)}</li>`;
+  return items.map((x, i) => fn(x).replace('<li', `<li${i >= n ? ' data-more hidden' : ''}`)).join('') +
+    (items.length > n ? `<li><button class="more" data-showmore>Show all ${items.length}</button></li>` : '');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-showmore]'); if (!b) return;
+  const ul = b.closest('ul'); ul.querySelectorAll('[data-more]').forEach(li => li.hidden = false); b.closest('li').remove();
+});
+function cardLine(c) {
+  return `<li><span class="t"><a href="/studio/card/${enc(c.id)}">${esc(c.title)}</a></span><span class="m">${esc(c.brand_label || c.brand)}</span><span class="badge ${STATUS_BADGE[c.status] || 'plain'}">${esc(c.status || '?')}</span></li>`;
+}
+async function showHome() {
+  try { D.home = await api('/api/studio/home'); }
+  catch (e) { $('#hStats').innerHTML = `<p class="empty">Couldn't load: ${esc(e.message)}</p>`; return; }
+  const h = D.home, tr = h.tracker || {};
+  $('#hHello').textContent = h.owner ? `What do you want to do, ${h.owner}?` : 'What do you want to do?';
+  $('#hAssets').hidden = !h.assets;
+  $('#hSetup').hidden = !h.rules_missing;
+  $('#nCards').textContent = h.cards.length || '';
+  const review = (tr['in review'] || []), reviewVids = review.filter(v => !v.effect_preview), fxPrev = review.filter(v => v.effect_preview);
+  const ready = tr['ready to post'] || [], sched = tr['scheduled'] || [];
+  const stat = (n, label, href, hot, tab) => `<a class="stat${hot && n ? ' hot' : ''}" href="${href}"${tab ? ` data-fl-tab="${tab}"` : ''}><b>${n}</b><span>${label}</span></a>`;
+  $('#hStats').innerHTML = stat(h.cards_open.length, 'edits in progress', '/studio/edits', true) +
+    stat(h.open_notes.reduce((s, v) => s + v.open, 0), `open notes on ${h.open_notes.length} video${h.open_notes.length === 1 ? '' : 's'}`, '/', true) +
+    stat(reviewVids.length, 'videos in review', '/library', true, 'videos') +
+    stat(ready.length, 'ready to post', '/library', false, 'videos') +
+    (sched.length ? stat(sched.length, 'scheduled', '/library', false, 'videos') : '') +
+    stat((h.counts || {}).posted || 0, 'posted', '/library', false, 'videos');
+  $('#hCards').innerHTML = rowsHTML(h.cards_open, 6, cardLine, 'No edits in progress. Start a new edit to make a card.');
+  $('#hNotes').innerHTML = rowsHTML(h.open_notes, 6, v => `<li><span class="t"><a href="${videoLink(v.path)}" title="${esc(v.path)}">${esc(v.name)}</a><span class="s">${esc(v.folder)}</span></span><span class="badge notes">${v.open} open</span></li>`, 'No open notes.');
+  $('#hReview').innerHTML = rowsHTML(reviewVids, 6, v => `<li><span class="t"><a href="${videoLink(v.file)}" title="${esc(v.file)}">${esc(v.title)}</a><span class="s">${esc(v.shoot)}</span></span></li>`, 'Nothing waiting.') +
+    (fxPrev.length ? `<li><span class="t">${fxPrev.length} effect previews are in review too</span><a class="m" href="/studio/glossary?status=in%20review">See them in the Glossary</a></li>` : '');
+  $('#hReady').innerHTML = rowsHTML(ready, 6, v => `<li><span class="t"><a href="${videoLink(v.file)}" title="${esc(v.file)}">${esc(v.title)}</a><span class="s">${esc(v.shoot)}</span></span></li>`, 'Nothing ready to post.');
+  $('#hLoopDoc').innerHTML = h.loop_html || '<p class="faint">guides/after-approval.md is missing.</p>';
+  const h1 = $('#hLoopDoc h1'); if (h1) h1.remove();
+}
+
+/* ---------- edits ---------- */
+async function showEdits() {
+  let cards = [];
+  try { cards = (await api('/api/studio/cards')).cards; } catch (e) { $('#eList').innerHTML = `<p class="empty">Couldn't load the cards: ${esc(e.message)}</p>`; return; }
+  $('#nCards').textContent = cards.length || '';
+  if (!cards.length) { $('#eList').innerHTML = '<p class="empty">No cards yet. <a href="/studio/new">Start a new edit</a> to make the first one.</p>'; return; }
+  const order = ['in progress', 'in review', 'new', 'approved'];
+  const label = { 'in progress': 'In progress', 'in review': 'In review', 'new': 'New', 'approved': 'Approved' };
+  const groups = [...order, ''].map(s => [s, cards.filter(c => s ? c.status === s : !order.includes(c.status))]).filter(([, l]) => l.length);
+  $('#eList').innerHTML = groups.map(([s, list]) => `<h2 class="sec">${esc(label[s] || 'Other')}</h2>` + list.map(c => `
+    <a class="cardrow" href="/studio/card/${enc(c.id)}">
+      <span class="t"><b>${esc(c.title)}</b><span>${esc([c.brand_label || c.brand, c.style, c.length, c.platform].filter(Boolean).join(' · '))}${c.error ? ' · <span class="err">' + esc(c.error) + '</span>' : ''}</span></span>
+      <span class="faint small">${esc(ago(c.updated))}</span><span class="badge ${STATUS_BADGE[c.status] || 'plain'}">${esc(c.status || '?')}</span>
+    </a>`).join('')).join('');
+}
+
+/* ---------- one card ---------- */
+async function loadOptions() { if (!D.options) D.options = await api('/api/studio/options'); return D.options; }
+function segButtons(el, items, value) {
+  el.innerHTML = items.map(it => {
+    const v = typeof it === 'string' ? it : it.name;
+    const inner = typeof it === 'string' ? esc(v.charAt(0).toUpperCase() + v.slice(1)) : `<b>${esc(it.label || v)}</b>${it.about ? `<span>${esc(it.about)}</span>` : ''}`;
+    return `<button type="button" data-v="${esc(v)}" class="${v === value ? 'on' : ''}" aria-pressed="${v === value}">${inner}</button>`;
+  }).join('');
+}
+function chipButtons(el, items, values) {
+  el.innerHTML = items.map(it => {
+    const v = typeof it === 'string' ? it : it.id, label = typeof it === 'string' ? it : it.title;
+    const on = values.includes(v);
+    return `<button type="button" class="chip${on ? ' on' : ''}" data-v="${esc(v)}" aria-pressed="${on}">${esc(label)}</button>`;
+  }).join('') || '<span class="faint small">Nothing to pick from yet.</span>';
+}
+function segValue(name) { const b = $(`[data-one="${name}"] button.on`); return b ? b.dataset.v : ''; }
+function chipValues(name) { return $$(`[data-many="${name}"] .chip.on`).map(b => b.dataset.v); }
+function setState(text, cls) { for (const id of ['#cState', '#cState2']) { $(id).textContent = text; $(id).className = 'state' + (cls ? ' ' + cls : ''); } }
+function markDirty() { D.dirty = true; setState('Not saved yet', 'dirty'); }
+$('#cardForm').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  const one = b.closest('[data-one]');
+  if (one) { one.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+             if (one.dataset.one === 'brand') $('[name=brand_other]').hidden = b.dataset.v !== 'Other'; }
+  else { b.classList.toggle('on'); b.setAttribute('aria-pressed', b.classList.contains('on')); }
+  markDirty();
+});
+$('#cardForm').addEventListener('input', e => { if (e.target.id !== 'fxFilter') markDirty(); });
+$('#fxFilter').addEventListener('input', () => {
+  const q = $('#fxFilter').value.trim().toLowerCase();
+  $$('#chFx .chip').forEach(c => c.hidden = !!q && !c.dataset.v.includes(q) && !c.classList.contains('on'));
+});
+async function showCard(id) {
+  $('#cErr').hidden = true; setState('');
+  let o;
+  try { o = await loadOptions(); } catch (e) { $('#cErr').textContent = "Couldn't load the form: " + e.message; $('#cErr').hidden = false; return; }
+  let c = { title: '', brand: '', brand_other: '', style: '', shoots: [], clips: '', vision: '', script: '', length: '', platform: '',
+            must_keep: '', must_avoid: '', classroom: [], effects: [], references: '', status: 'new' };
+  if (id) {
+    try { c = Object.assign(c, await api('/api/studio/card?id=' + enc(id))); }
+    catch (e) { $('#cHead').textContent = 'Card not found'; $('#cErr').textContent = e.message; $('#cErr').hidden = false; $('#cardForm').querySelectorAll('.field').forEach(f => f.hidden = true); return; }
+  }
+  $('#cardForm').querySelectorAll('.field').forEach(f => f.hidden = false);
+  D.card = id ? c : null;
+  $('#cHead').textContent = id ? c.title : 'New edit';
+  document.title = (id ? c.title : 'New edit') + ' · Video Studio';
+  const f = $('#cardForm');
+  for (const k of ['title', 'brand_other', 'clips', 'vision', 'script', 'length', 'must_keep', 'must_avoid', 'references']) f.elements[k].value = c[k] || '';
+  segButtons($('#segBrand'), o.brands, c.brand);
+  f.elements.brand_other.hidden = c.brand !== 'Other';
+  segButtons($('#segStyle'), o.styles, c.style);
+  segButtons($('#segStatus'), o.statuses, c.status || 'new');
+  $('#selPlatform').innerHTML = '<option value="">Choose…</option>' + o.platforms.map(p => `<option${p === c.platform ? ' selected' : ''}>${esc(p)}</option>`).join('');
+  const shoots = [...new Set([...(c.shoots || []), ...o.shoots])];
+  chipButtons($('#chShoots'), shoots, c.shoots || []);
+  chipButtons($('#chClass'), o.classroom, c.classroom || []);
+  chipButtons($('#chFx'), o.effects, c.effects || []);
+  $('#fxFilter').value = '';
+  showTell(id ? c.title : '');
+  D.dirty = false;
+  setState(id && c.updated ? 'Saved ' + ago(c.updated) : (id ? '' : 'Not saved yet'));
+  if (!id) setTimeout(() => f.elements.title.focus(), 0);
+}
+function showTell(title) {
+  $('#cTell').hidden = !title;
+  $('#cTellText').textContent = `start the card "${title}"`;
+}
+$('#cCopy').addEventListener('click', () => copy($('#cTellText').textContent));
+async function saveCard(e) {
+  if (e) e.preventDefault();
+  const f = $('#cardForm');
+  const body = {};
+  for (const k of ['title', 'brand_other', 'clips', 'vision', 'script', 'length', 'must_keep', 'must_avoid', 'references', 'platform']) body[k] = f.elements[k].value;
+  body.brand = segValue('brand'); body.style = segValue('style'); body.status = segValue('status') || 'new';
+  body.shoots = chipValues('shoots'); body.classroom = chipValues('classroom'); body.effects = chipValues('effects');
+  if (D.card) { body.id = D.card.id; body.seen_updated = D.card.updated || ''; }
+  if (!body.title.trim()) { $('#cErr').textContent = 'Give the edit a title first.'; $('#cErr').hidden = false; f.elements.title.focus(); return; }
+  $('#cErr').hidden = true;
+  $$('#cardForm button[type=submit]').forEach(b => b.disabled = true);
+  setState('Saving…');
+  try {
+    const c = await api('/api/studio/card', body);
+    const isNew = !D.card;
+    D.card = c; D.dirty = false; D.home = null;
+    $('#cHead').textContent = c.title; showTell(c.title);
+    segButtons($('#segStyle'), D.options.styles, c.style);
+    setState('Saved', 'ok');
+    if (isNew) history.replaceState(null, '', '/studio/card/' + enc(c.id));
+    document.title = c.title + ' · Video Studio';
+    toast(isNew ? 'Card saved. Tell Claude: start the card "' + c.title + '"' : 'Saved');
+  } catch (err) {
+    setState('Not saved', 'dirty');
+    $('#cErr').innerHTML = esc(err.status === 409 ? err.message : "Couldn't save: " + err.message) +
+      (err.status === 409 ? ' <button type="button" class="ghost" id="cReload">Reload the card</button>' : '');
+    $('#cErr').hidden = false;
+    const rl = $('#cReload'); if (rl) rl.onclick = () => { D.dirty = false; showCard(D.card.id); };
+  } finally { $$('#cardForm button[type=submit]').forEach(b => b.disabled = false); }
+}
+$('#cardForm').addEventListener('submit', saveCard);
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's' && !$('#v-card').hidden) { e.preventDefault(); saveCard(); }
+});
+
+/* ---------- glossary ---------- */
+const GROUPS = [['all', 'Everything'], ['effect', 'Effects'], ['style', 'Styles and skins'], ['layout', 'Fast Cut layouts'],
+                ['look', 'Looks in review'], ['word', 'Studio words'], ['status', 'Tracker statuses'], ['command', 'Commands']];
+const G = { group: 'all', status: 'all' };
+async function showGlossary() {
+  const q = new URLSearchParams(location.search);
+  if (q.get('status')) G.status = q.get('status');
+  if (!D.glossary) {
+    try { D.glossary = await api('/api/studio/glossary'); }
+    catch (e) { $('#gList').innerHTML = `<p class="empty">Couldn't build the glossary: ${esc(e.message)}</p>`; return; }
+  }
+  const n = D.glossary.entries.length;
+  $('#gCount').textContent = `${n} names · ${D.glossary.in_review} in review`;
+  if (!$('#gq').dataset.init) { $('#gq').value = store.get('gq', ''); $('#gq').dataset.init = '1'; }
+  drawGlossary();
+  focusGlossaryEntry();
+}
+function focusGlossaryEntry() { // /studio/glossary#g-<name> (Video Review links here): show that entry and point it out
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id.startsWith('g-')) return;
+  let el = document.getElementById(id);
+  if (!el) { G.group = 'all'; G.status = 'all'; $('#gq').value = ''; drawGlossary(); el = document.getElementById(id); }
+  if (!el) return;
+  setTimeout(() => { el.scrollIntoView({ block: 'center' }); el.classList.add('found'); setTimeout(() => el.classList.remove('found'), 2600); }, 30);
+}
+function groupOf(e) { return e.group === 'skin' ? 'style' : e.group; }
+function drawGlossary() {
+  const all = D.glossary.entries;
+  const cnt = g => all.filter(e => g === 'all' || groupOf(e) === g).length;
+  $('#gGroups').innerHTML = GROUPS.filter(([g]) => cnt(g)).map(([g, l]) => `<button data-g="${g}" class="${G.group === g ? 'on' : ''}">${l} <span class="faint">${cnt(g)}</span></button>`).join('');
+  const sts = [['all', 'Any status'], ['approved', 'Approved'], ['in review', 'In review']];
+  $('#gStatus').innerHTML = sts.map(([s, l]) => `<button data-s="${s}" class="${G.status === s ? 'on' : ''}">${l}</button>`).join('');
+  const ws = $('#gq').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  store.set('gq', $('#gq').value);
+  const list = all.filter(e => (G.group === 'all' || groupOf(e) === G.group) && (G.status === 'all' || e.status === G.status) &&
+    (!ws.length || ws.every(w => [e.name, e.command, e.kind, e.about, (e.fits || []).join(' '), (e.aliases || []).join(' '), (e.also || []).map(a => a.command).join(' '), e.where, e.status].join(' ').toLowerCase().includes(w))));
+  $('#gLine').textContent = `${list.length} of ${all.length}`;
+  $('#gList').innerHTML = list.map(gItem).join('') || '<p class="empty">Nothing matches. Try fewer words or another filter.</p>';
+}
+function statusBadge(e) {
+  if (!e.status) return '';
+  return `<span class="badge ${e.status === 'approved' ? 'ok' : 'review'}" title="${esc(e.status_why || '')}">${e.status === 'approved' ? 'Approved' : 'In review'}</span>`;
+}
+function gItem(e) {
+  const meta = [];
+  if (e.fits && e.fits.length) meta.push(`<b>${e.group === 'style' || e.group === 'skin' ? 'Good for' : 'When it fits'}:</b> ${esc(e.fits.join(' · '))}`);
+  if (e.restrained) meta.push('<b>Restrained:</b> one of the quiet effects for brands set to restrained in brand.json');
+  if (e.ask_first) meta.push('<b>Tech look:</b> only when you ask for it');
+  if (e.also && e.also.length) meta.push('<b>Also:</b> ' + e.also.map(a => `<button class="cmd" data-copy="${esc(a.command)}">${esc(a.command)}</button> ${esc(a.about)}`).join(' · '));
+  if (e.aliases && e.aliases.length) meta.push(`<b>Also called:</b> ${esc(e.aliases.join(', '))}`);
+  if (e.from && e.from.length) meta.push('<b>From:</b> ' + e.from.map(r => `<a href="/studio/classroom#${esc(r.id)}">${esc(r.title)}</a>`).join(' · '));
+  if (e.built_with) meta.push(`<b>Built with:</b> ${esc(e.built_with.replace(/`/g, ''))}`);
+  if (e.where) meta.push(`<b>Made for:</b> ${esc(e.where)}`);
+  if (e.length) meta.push(`<b>Default length:</b> ${esc(e.length)} s`);
+  let pv = '';
+  if (e.group === 'effect') {
+    pv = e.preview && e.preview.exists
+      ? `<div class="gmeta pv"><b>Preview:</b> <button class="linkbtn" data-play="${esc(e.preview.path)}">Play it here</button> · <a href="${videoLink(e.preview.path)}">Open in Video Review</a></div>`
+      : `<div class="gmeta"><b>Preview:</b> no preview file${e.preview && e.preview.path ? ' (looked for ' + esc(e.preview.path) + ')' : ''}</div>`;
+    if (e.sample) pv += `<img class="strip" loading="lazy" src="${esc(e.sample)}" alt="Frames from the ${esc(e.name)} preview">`;
+  }
+  return `<article class="gitem" id="g-${esc(e.name.replace(/[^a-z0-9-]/gi, '-'))}">
+    <div class="gtop"><span class="gname">${esc(e.name)}</span>${e.command && e.command !== e.name ? `<button class="cmd" data-copy="${esc(e.command)}" title="Copy">${esc(e.command)}</button>` : (e.command ? `<button class="cmd" data-copy="${esc(e.command)}" title="Copy">copy</button>` : '')}
+      ${statusBadge(e)}<span class="kind">${esc(e.kind || '')}</span></div>
+    <p>${e.about_html != null ? e.about_html : esc(e.about)}</p>
+    ${meta.map(m => `<div class="gmeta">${m}</div>`).join('')}
+    ${pv}
+    <div class="gmeta faint small">From ${esc(e.source || '')}${e.status_why ? ' · ' + esc(e.status_why) : ''}</div>
+  </article>`;
+}
+$('#gGroups').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; G.group = b.dataset.g; drawGlossary(); });
+$('#gStatus').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; G.status = b.dataset.s; drawGlossary(); });
+let gT = 0; $('#gq').addEventListener('input', () => { clearTimeout(gT); gT = setTimeout(drawGlossary, 120); });
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'); if (c) { copy(c.dataset.copy); return; }
+  const p = e.target.closest('[data-play]');
+  if (p) {
+    const box = p.closest('.pv'); const old = box.querySelector('video');
+    if (old) { old.remove(); p.textContent = 'Play it here'; return; }
+    const v = document.createElement('video'); v.controls = true; v.autoplay = true; v.preload = 'auto'; v.playsInline = true;
+    v.src = '/media?path=' + enc(p.dataset.play); box.appendChild(v); p.textContent = 'Close the preview';
+  }
+});
+
+/* ---------- classroom + ideas: the same kind of card on two shelves ---------- */
+function makeShelf(key, o) {
+  const S = { tag: '' };
+  function draw() {
+    const C = D[key];
+    $(o.tags).innerHTML = `<button data-t="" class="${S.tag ? '' : 'on'}">All</button>` + C.tags.map(t => `<button data-t="${esc(t)}" class="${S.tag === t ? 'on' : ''}">${esc(t)}</button>`).join('');
+    const ws = $(o.q).value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const list = C.entries.filter(e => (!S.tag || e.tags.includes(S.tag)) && (!ws.length || ws.every(w => (e.search || '').toLowerCase().includes(w))));
+    $(o.count).textContent = `${list.length} of ${C.entries.length} reels`;
+    $(o.list).innerHTML = list.map(e => `
+    <article class="lesson" id="${esc(e.id)}">
+      <div class="ltop"><h3>${esc(e.title)}</h3><span class="muted">${esc(e.creator)}</span><span class="faint small">added ${esc(e.added || 'date not recorded')}</span>
+        ${e.link ? `<a href="${esc(e.link)}" target="_blank" rel="noopener">Open the reel</a>` : `<span class="faint small">${esc(e.link_note)}</span>`}</div>
+      <div class="chips" style="margin:6px 0 0">${e.tags.map(t => `<button class="chip" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+      <div class="lsecs">${e.sections.map(s => `<div class="lsec"><h4>${esc(s.title)}</h4><div class="doc">${s.html}</div></div>`).join('')}</div>
+      <div class="gmeta faint small">${esc(e.file)}</div>
+    </article>`).join('') || `<p class="empty">${C.entries.length ? 'Nothing matches.' : esc(o.empty)}</p>`;
+  }
+  $(o.tags).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.tag = b.dataset.t; draw(); });
+  $(o.list).addEventListener('click', e => { const b = e.target.closest('[data-tag]'); if (!b) return; S.tag = b.dataset.tag; draw(); window.scrollTo(0, 0); });
+  $(o.q).addEventListener('input', () => { if (D[key]) draw(); });
+  return async function show() {
+    if (!D[key]) {
+      try { D[key] = await api(o.api); }
+      catch (e) { $(o.list).innerHTML = `<p class="empty">Couldn't load ${esc(o.name)}: ${esc(e.message)}</p>`; return; }
+    }
+    draw();
+    if (location.hash) setTimeout(() => scrollToId(location.hash.slice(1)), 30);
+  };
+}
+const showClassroom = makeShelf('classroom', { api: '/api/studio/classroom', q: '#kq', tags: '#kTags', list: '#kList', count: '#kCount',
+  name: 'the classroom', empty: 'No editing references yet.' });
+const showIdeas = makeShelf('ideas', { api: '/api/studio/ideas', q: '#iq', tags: '#iTags', list: '#iList', count: '#iCount',
+  name: 'the ideas', empty: 'No ideas saved yet.' });
+
+/* ---------- guides ---------- */
+async function showGuides(key) {
+  if (!D.guides) {
+    try { D.guides = (await api('/api/studio/guides')).guides; }
+    catch (e) { $('#dDoc').innerHTML = `<p class="empty">Couldn't load the guides: ${esc(e.message)}</p>`; return; }
+  }
+  key = key || 'storytelling';
+  const mine = D.guides.filter(g => g.new && g.exists), theirs = D.guides.filter(g => !g.new && g.exists);
+  const link = g => `<a href="/studio/guides/${enc(g.key)}" class="${g.key === key ? 'on' : ''}">${esc(g.title)}<span>${esc(g.about)}</span></a>`;
+  $('#dList').innerHTML = `<div class="grp">Start here</div>${mine.map(link).join('')}<div class="grp">How the tools work (written for Claude)</div>${theirs.map(link).join('')}`;
+  $('#dDoc').innerHTML = '<p class="faint">Loading…</p>';
+  try {
+    const g = await api('/api/studio/guide?key=' + enc(key));
+    $('#dDoc').innerHTML = g.html; $('#dPath').textContent = `${g.path} · changed ${g.updated.replace('T', ' ')}`;
+    document.title = g.title + ' · Video Studio';
+  } catch (e) { $('#dDoc').innerHTML = `<p class="empty">Couldn't open this guide: ${esc(e.message)}</p>`; $('#dPath').textContent = ''; }
+}
+
+/* ---------- what to say ---------- */
+async function showSay() {
+  try { const g = await api('/api/studio/guide?key=what-to-say'); $('#sDoc').innerHTML = g.html; const h1 = $('#sDoc h1'); if (h1) h1.remove(); }
+  catch (e) { $('#sDoc').innerHTML = `<p class="empty">Couldn't load guides/what-to-say.md: ${esc(e.message)}</p>`; }
+  if (!D.glossary) { try { D.glossary = await api('/api/studio/glossary'); } catch { return; } }
+  const cmds = [];
+  for (const e of D.glossary.entries) {
+    if (e.command) cmds.push([e.command, e.about]);
+    for (const a of e.also || []) cmds.push([a.command, `${e.name}, ${a.about}`]);
+  }
+  $('#sCmds').innerHTML = cmds.sort((a, b) => a[0].localeCompare(b[0])).map(([c, t]) => `<button class="chip" data-copy="${esc(c)}" title="${esc(t)}">${esc(c)}</button>`).join('');
+}
+$('#sDoc').addEventListener('click', e => { const c = e.target.closest('code'); if (c) copy(c.textContent); });
+
+render();
+</script>
+</body>
+</html>

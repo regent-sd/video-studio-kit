@@ -1,0 +1,17 @@
+{
+  "name": "example",
+  "brand": "example-brand",
+  "wordmark": "Mossy",
+  "title": "Add a plant and keep it watered",
+  "kicker": "Mossy walkthrough · 1",
+  "steps": {
+    "2": "Add a plant",
+    "3": "Mark it watered",
+    "4": "Find a room"
+  },
+  "end_line": "Questions? Reply to any email from us.",
+  "captions": true,
+  "punch": [
+    {"scene": 3, "line": 1, "delay": 0.4, "hold": 2.2, "scale": 1.5}
+  ]
+}
